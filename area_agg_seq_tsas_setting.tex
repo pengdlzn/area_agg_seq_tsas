@@ -6,28 +6,49 @@
 %\usepackage{refcheck}%compile twice in order to see the effects
 %Acknowledgments
 %link to my prototype
-%remove \AtBeginDocument before submitting
 
-%\smartqed  % flush right qed marks, e.g. at end of proof
 
-%%cut the blank margin
-%\AtBeginDocument{%
-%	\paperwidth=\dimexpr
-%	1in + \oddsidemargin
-%	+ \textwidth
-%	% + \marginparsep + \marginparwidth
-%	+ 1in + \oddsidemargin
-%	\relax
-%	\paperheight=\dimexpr
-%	1in + \topmargin
-%	+ \headheight + \headsep
-%	+ \textheight
-%	% + \footskip
-%	+ 1in + \topmargin
-%	\relax
-%	\usepackage[pass]{geometry}\relax
-%}
 
+
+
+
+\usepackage[ruled]{algorithm2e} % For algorithms
+\renewcommand{\algorithmcfname}{ALGORITHM}
+\SetAlFnt{\small}
+\SetAlCapFnt{\small}
+\SetAlCapNameFnt{\small}
+\SetAlCapHSkip{0pt}
+\IncMargin{-\parindent}
+
+% Metadata Information
+\acmJournal{TSAS}
+\acmVolume{0}
+\acmNumber{0}
+\acmArticle{00}
+\acmYear{0000}
+\acmMonth{0}
+\acmArticleSeq{00}
+
+%\acmBadgeR[http://ctuning.org/ae/ppopp2016.html]{ae-logo}
+%\acmBadgeL[http://ctuning.org/ae/ppopp2016.html]{ae-logo}
+
+
+% Copyright
+%\setcopyright{acmcopyright}
+%\setcopyright{acmlicensed}
+%\setcopyright{rightsretained}
+%\setcopyright{usgov}
+\setcopyright{usgovmixed}
+%\setcopyright{cagov}
+%\setcopyright{cagovmixed}
+
+% DOI
+\acmDOI{0000001.0000001}
+
+% Paper history
+\received{February 2007}
+\received{March 2009}
+\received[accepted]{June 2009}
 
 \usepackage{eurosym} %for the sign '€'
 %\usepackage{etex}
@@ -48,11 +69,11 @@
 \usepackage{graphicx}        % standard LaTeX graphics tool
 % when including figure files
 \usepackage{multicol}        % used for the two-column index
-%\usepackage[bottom]{footmisc}% places footnotes at page bottom
+\usepackage[bottom]{footmisc}% places footnotes at page bottom
 %\usepackage[disable]{todonotes}
 %\usepackage{todonotes}
 %\setlength{\marginparwidth}{3cm} %set the width of todonotes
-%\usepackage[defaultlines=4,all]{nowidow}%forbid widow or orphan
+\usepackage[defaultlines=4,all]{nowidow}%forbid widow or orphan
 
 
 %%\usepackage{biblatex}
@@ -87,47 +108,80 @@
 %]{biblatex}
 %
 %
-%%remove the information we don't want to present
-%\AtEveryBibitem{% Clean up the bibtex rather than editing it
-%	\clearlist{address}
-%	\clearfield{date}
-%	\clearfield{eprint}
-%	\clearfield{isbn}
-%	\clearfield{issn}
-%	\clearlist{location}
-%	\clearfield{month}
-%	\clearlist{language}
-%	%	\clearfield{series}
-%	
-%	\ifentrytype{book}{}{% Remove publisher and editor except for books
-%		\clearlist{publisher}
-%		%		\clearname{editor}
-%	}
-%}
+
+% Hack to try to make acmart work with biblatex: https://tex.stackexchange.com/questions/37076/is-it-possible-to-load-biblatex-with-a-class-that-has-already-loaded-natbib
+\let\citename\relax
+\RequirePackage[
+backend=bibtex,
+style=numeric-comp, %number the references, compact
+%style=authoryear, %no indices before names; year after names
+%style=alphabetic, %style for my thesis
 %
-%
-%%\renewcommand*{\bibfont}{\small} %set the font size of the 
-%%references
+sorting=nyvt, %sort in bibliography by name, year, volume, title
+sortcites, %sort in content by numbering
+hyperref=true,%transform citations and back references into 
+%clickable hyperlinks
+backref=true, %to print back references in the bibliography
+backrefstyle=three, %Compress three or more consecutive pages 
+%to a range
+%,
+%citestyle=authoryear,
+maxbibnames=9, %the author names appearing in bibliography
+maxcitenames=2, %the author names appearing in text
+firstinits=true,
+terseinits=true,%remove periods after initials of first names
+doi=true,
+isbn=false,url=false,eprint=false,
+%dashed=false,
+%useprefix=false,%sort bibliography use prefix like "van"
+natbib=true,
+style=ACM-Reference-Format,
+language=american,
+abbreviate=true, dateabbrev=true,
+]{biblatex}
+
+%[abbreviate=true, dateabbrev=true, isbn=true, doi=true, urldate=comp, url=true, maxbibnames=9, backref=false, backend=bibtex, style=ACM-Reference-Format, language=american,natbib]{biblatex}
+
+\addbibresource{Reference/BibReference.bib}
+
+%remove the information we don't want to present
+\AtEveryBibitem{% Clean up the bibtex rather than editing it
+	\clearlist{address}
+	\clearfield{date}
+	\clearfield{eprint}
+	\clearfield{isbn}
+	\clearfield{issn}
+	\clearlist{location}
+	\clearfield{month}
+	\clearlist{language}
+	%	\clearfield{series}
+	
+	\ifentrytype{book}{}{% Remove publisher and editor except for books
+		\clearlist{publisher}
+		%		\clearname{editor}
+	}
+}
+
+
+\renewcommand*{\bibfont}{\small}%set the font size of references
 %\renewcommand*{\nameyeardelim}{\addspace} %\remove the comma 
 %%between author and year in citations
-%\renewcommand*{\revsdnamepunct}{} %remove commas between last and first names 
-%%in bibliography
-%%\renewcommand{\labelnamepunct}{\addspace} %remove the punctuation after the 
-%%year in bibliography
+%\renewcommand*{\revsdnamepunct}{} %remove commas between last and first names in bibliography
+%%\renewcommand{\labelnamepunct}{\addspace} %remove the punctuation after the year in bibliography
 %\renewcommand{\finentrypunct}{} %remove the full stop at the end of each
 %%bibliography entry
 %\addbibresource{Reference/BibReference.bib}
 %%\fi
 %
 %%\iffalse
-%%We may have set prefix=false in \usepackage[]{biblatex}.
-%%Here, we turn on \useprefix in the actual document 
-%% i.e. in the citations and bibliography
-%\makeatletter
-%\AtBeginDocument{\toggletrue{blx@useprefix}}
-%\makeatother
-%%Since we want the prefix to be in lower-case in the bibliography, we issue
-%\renewbibmacro*{begentry}{\midsentence}
+%We may have set prefix=false in \usepackage[]{biblatex}.
+%Here, we turn on \useprefix in the actual document 
+% i.e. in the citations and bibliography
+\makeatletter
+\AtBeginDocument{\toggletrue{blx@useprefix}}
+\makeatother
+%Since we want the prefix to be in lower-case in the bibliography, we issue
+\renewbibmacro*{begentry}{\midsentence}
 %%\fi
 
 \usepackage[font=small,labelfont=bf]{caption}
@@ -246,7 +300,7 @@
 \newcommand{\sects}{Sections~}
 \newcommand{\tabs}{Tables~}
 \newcommand{\myquad}[1][1]{\hspace*{#1em}\ignorespaces}
-\newcommand{\eqquad}{\myquad[4]}
+\newcommand{\eqquad}{\myquad[6]}
 \newcommand{\inquad}{\qquad}
 
 %M or N are default tags. The boxes using the same tag will have the same length. The length is the maximum length of all the equations in the boxes that use the same tag
@@ -305,18 +359,7 @@
 
 %\newcolumntype{y}[1]{>{\raggedleft\arraybackslash\hspace{0pt}}p{#1}}
 %\newcolumntype{x}[1]{>{\centering\arraybackslash\hspace{0pt}}p{#1}}
-%
-%\usepackage{mathptmx}%use Times fonts if available on your TeX system
-%
-% insert here the call for the packages your document requires
-%\usepackage{latexsym}
-% etc.
-%
-% please place your own definitions here and don't use \def but
-% \newcommand{}{}
-%
-% Insert the name of "your journal" with
-% \journalname{myjournal}
+
 
 
 %make package refcheck compatible with package hyperref 
