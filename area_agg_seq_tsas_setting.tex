@@ -1,0 +1,347 @@
+% !TeX spellcheck = <none>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%FINAL VERSION:
+%look for numbered but unlabelled equations
+%\usepackage{refcheck}%compile twice in order to see the effects
+%Acknowledgments
+%link to my prototype
+%remove \AtBeginDocument before submitting
+
+%\smartqed  % flush right qed marks, e.g. at end of proof
+
+%%cut the blank margin
+%\AtBeginDocument{%
+%	\paperwidth=\dimexpr
+%	1in + \oddsidemargin
+%	+ \textwidth
+%	% + \marginparsep + \marginparwidth
+%	+ 1in + \oddsidemargin
+%	\relax
+%	\paperheight=\dimexpr
+%	1in + \topmargin
+%	+ \headheight + \headsep
+%	+ \textheight
+%	% + \footskip
+%	+ 1in + \topmargin
+%	\relax
+%	\usepackage[pass]{geometry}\relax
+%}
+
+
+\usepackage{eurosym} %for the sign '€'
+%\usepackage{etex}
+
+%\usepackage[english]{babel}
+%
+\usepackage[utf8]{inputenc}
+% choose options for [] as required from the list
+% in the Reference Guide
+
+%\usepackage{mathptmx} % selects Times Roman as basic font
+%\usepackage{helvet}   % selects Helvetica as sans-serif font
+%\usepackage{courier}  % selects Courier as typewriter font
+%\usepackage{type1cm}  % activate if the above 3 fonts are
+%% not available on your system
+%
+%\usepackage{makeidx}         % allows index generation
+\usepackage{graphicx}        % standard LaTeX graphics tool
+% when including figure files
+\usepackage{multicol}        % used for the two-column index
+%\usepackage[bottom]{footmisc}% places footnotes at page bottom
+%\usepackage[disable]{todonotes}
+%\usepackage{todonotes}
+%\setlength{\marginparwidth}{3cm} %set the width of todonotes
+%\usepackage[defaultlines=4,all]{nowidow}%forbid widow or orphan
+
+
+%%\usepackage{biblatex}
+%%\iffalse
+%% Hack to try to make acmart work with biblatex: https://tex.stackexchange.com/questions/37076/is-it-possible-to-load-biblatex-with-a-class-that-has-already-loaded-natbib
+%\let\citename\relax
+%\RequirePackage
+%\usepackage[
+%backend=bibtex,
+%style=numeric-comp, %number the references, compact
+%%style=authoryear, %no indices before names; year after names
+%%style=alphabetic, %style for my thesis
+%%
+%sorting=nyvt, %sort in bibliography by name, year, volume, title
+%sortcites, %sort in content by numbering
+%hyperref=true,%transform citations and back references into 
+%%clickable hyperlinks
+%backref=true, %to print back references in the bibliography
+%backrefstyle=three, %Compress three or more consecutive pages 
+%%to a range
+%%,
+%%citestyle=authoryear,
+%maxbibnames=9, %the author names appearing in bibliography
+%maxcitenames=2, %the author names appearing in text
+%firstinits=true,
+%terseinits=true,%remove periods after initials of first names
+%doi=false,
+%isbn=false,url=false,eprint=false,
+%%dashed=false,
+%%useprefix=false,%sort bibliography use prefix like "van"
+%natbib=true
+%]{biblatex}
+%
+%
+%%remove the information we don't want to present
+%\AtEveryBibitem{% Clean up the bibtex rather than editing it
+%	\clearlist{address}
+%	\clearfield{date}
+%	\clearfield{eprint}
+%	\clearfield{isbn}
+%	\clearfield{issn}
+%	\clearlist{location}
+%	\clearfield{month}
+%	\clearlist{language}
+%	%	\clearfield{series}
+%	
+%	\ifentrytype{book}{}{% Remove publisher and editor except for books
+%		\clearlist{publisher}
+%		%		\clearname{editor}
+%	}
+%}
+%
+%
+%%\renewcommand*{\bibfont}{\small} %set the font size of the 
+%%references
+%\renewcommand*{\nameyeardelim}{\addspace} %\remove the comma 
+%%between author and year in citations
+%\renewcommand*{\revsdnamepunct}{} %remove commas between last and first names 
+%%in bibliography
+%%\renewcommand{\labelnamepunct}{\addspace} %remove the punctuation after the 
+%%year in bibliography
+%\renewcommand{\finentrypunct}{} %remove the full stop at the end of each
+%%bibliography entry
+%\addbibresource{Reference/BibReference.bib}
+%%\fi
+%
+%%\iffalse
+%%We may have set prefix=false in \usepackage[]{biblatex}.
+%%Here, we turn on \useprefix in the actual document 
+%% i.e. in the citations and bibliography
+%\makeatletter
+%\AtBeginDocument{\toggletrue{blx@useprefix}}
+%\makeatother
+%%Since we want the prefix to be in lower-case in the bibliography, we issue
+%\renewbibmacro*{begentry}{\midsentence}
+%%\fi
+
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{subcaption}
+\usepackage{setspace}
+\usepackage{bm} %Bold italic vectors
+\usepackage{gensymb}  % for degree sign, e.g., temperature
+\usepackage{amsmath}  %align equations; text inside math
+\usepackage{amstext}
+\usepackage{amsfonts}  %for \mathbb{Z}
+\usepackage{amssymb} % for \smallsetminus
+\usepackage{array}  %for define the fomats of columns in a table
+\usepackage{dcolumn}
+\usepackage[T1]{fontenc}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{tabularx}
+\usepackage{adjustbox}
+\usepackage{capt-of}
+\usepackage{subdepth} %fix the height problem of subscript
+
+
+
+
+%\newcommand{\revise}[2]{#2}
+%\newcommand{\jan}[1]{{\color{red}#1}}
+%\usepackage{siunitx} %for scientific 
+%notation
+%%we do this because of a bug of package floatrow
+%\let\tmp\newinsert
+%\let\newinsert\newbox
+%\usepackage{floatrow}
+%\let\newinsert\tmp
+
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{xspace}
+\usepackage{booktabs} %for using \toprule, \midrule, and \bottomrule in a table
+
+
+
+\graphicspath{{figures/}}
+
+%%\iffalse
+%%For the references, the following commands make the titles 
+%%lowercase (sentence case),
+%%while keep book/journal/conference etc. names unchanged 
+%\DeclareFieldFormat{sentencecase}{\MakeSentenceCase{#1}}
+%\renewbibmacro*{title}{%
+%	\ifthenelse{\iffieldundef{title}\AND\iffieldundef{subtitle}}
+%	{}
+%	{\ifthenelse{\ifentrytype{article}\OR\ifentrytype{inbook}%
+%			\OR\ifentrytype{incollection}\OR\ifentrytype{inproceedings}%
+%			\OR\ifentrytype{inreference}}
+%		{\printtext[title]{%
+%				\printfield[sentencecase]{title}%
+%				\setunit{\subtitlepunct}%
+%				\printfield[sentencecase]{subtitle}}}%
+%		{\printtext[title]{%
+%				\printfield[titlecase]{title}%
+%				\setunit{\subtitlepunct}%
+%				\printfield[titlecase]{subtitle}}}%
+%		\newunit}%
+%	\printfield{titleaddon}}
+%
+%%Remove the quotation marks for the titles in the reference
+%\DeclareFieldFormat[article,inbook,incollection,inproceedings,
+%patent,thesis,unpublished]{citetitle}{#1}
+%\DeclareFieldFormat[article,inbook,incollection,inproceedings,
+%patent,thesis,unpublished]{title}{#1}
+%\DeclareNameAlias{author}{last-first}
+%%\fi
+
+
+
+%%Using \DeclarePairedDelimiter from mathtools, you could define 
+%%macros \ceil and \floor, which will scale the delimiters 
+%%properly (if starred):
+\usepackage{mathtools}
+%\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+%\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\pgfplotsset{
+	compat=newest,
+	xlabel near ticks,
+	ylabel near ticks
+}
+\newcommand{\Astar}{A$^{\!\star}$\xspace}
+\newcommand{\tstar}{\ensuremath{t\xspace}}
+\newcommand{\Pistar}{\ensuremath{\Pi}} % 
+%\newcommand{\Comp}[1]{c_#1} % 
+\newcommand{\comp}[1]{[#1]} % 
+\newcommand{\edgenum}[1]{\|#1\|}
+\newcommand{\area}[1]{\overline{#1}}
+%{\Pi_{\mathrm{start}}(\tstar)}
+\newcommand{\Pstart}{\ensuremath{P_\mathrm{start}}\xspace}
+\newcommand{\Pgoal}{\ensuremath{P_\mathrm{goal}}\xspace}
+\newcommand{\Pnode}{\ensuremath{P_{t,i}}\xspace}
+\newcommand{\Psnode}{\ensuremath{P_{s,i}}\xspace}
+\newcommand{\Tgoal}{\ensuremath{T_\mathrm{goal}}\xspace}
+
+
+
+
+\newcommand{\e}[1]{\times 10^{#1}}
+\newcommand{\fig}{Figure~}
+\newcommand{\eq}{Equation~}
+\newcommand{\fo}{Formula~}
+\newcommand{\sect}{Section~}
+\newcommand{\tab}{Table~}
+\newcommand{\chap}{Chapter~}
+\newcommand{\figs}{Figures~}
+\newcommand{\eqs}{Equations~}
+\newcommand{\fos}{Formulas~}
+\newcommand{\sects}{Sections~}
+\newcommand{\tabs}{Tables~}
+\newcommand{\myquad}[1][1]{\hspace*{#1em}\ignorespaces}
+\newcommand{\eqquad}{\myquad[4]}
+\newcommand{\inquad}{\qquad}
+
+%M or N are default tags. The boxes using the same tag will have the same length. The length is the maximum length of all the equations in the boxes that use the same tag
+%see also https://tex.stackexchange.com/questions/381502/how-to-align-text-in-multiple-separate-align-environments
+\usepackage{eqparbox}
+\newcommand{\embl}[2][M]
+{\eqmakebox[#1][l]{$#2$}}
+\newcommand{\embr}[2][N]
+{\eqmakebox[#1][r]{$#2$}}
+\newcommand{\embld}[2][M]
+{\eqmakebox[#1][l]{$\displaystyle#2$}}
+\newcommand{\embrd}[2][N]
+{\eqmakebox[#1][r]{$\displaystyle#2$}}
+
+
+
+\newcommand{\mypar}[1]{\bigskip\noindent\textbf{#1.}~}
+
+%\renewcommand{\floatpagefraction}{.6}
+%\renewcommand{\textfraction}{0.01}
+%\renewcommand{\topfraction}{0.95}
+%\renewcommand{\bottomfraction}{0.95}
+%\renewcommand{\dbltopfraction}{0.95} % fit big float above 
+%2-col. text
+%\renewcommand\thesection{\arabic{section}}
+%\renewcommand\thesubsection{\thesection.\arabic{subsection}}
+
+% math-mode version of "l" column type
+\newcolumntype{L}{>{$}l<{$}}
+% math-mode version of "r" column type
+\newcolumntype{R}{>{$}r<{$}}
+% math-mode version of "c" column type
+\newcolumntype{C}{>{$}c<{$}}
+%align numbers by decimal points in table; 
+%need package {dcolumn} and {array} 
+\newcolumntype{d}[1]{D{'}{.}{#1}}
+
+%x:l, y:c, z:r, with specified width
+\newcolumntype{x}[1]
+{>{\raggedright\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{y}[1]
+{>{\centering\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{z}[1]
+{>{\raggedleft\arraybackslash\hspace{0pt}}m{#1}}
+
+%math-mode version of "x,y,z" column type
+\newcolumntype{X}[1]
+{>{\raggedright\arraybackslash\hspace{0pt}}m{$#1$}}
+\newcolumntype{Y}[1]
+{>{\centering\arraybackslash\hspace{0pt}}m{$#1$}}
+\newcolumntype{Z}[1]
+{>{\raggedleft\arraybackslash\hspace{0pt}}m{$#1$}}
+
+
+
+
+%\newcolumntype{y}[1]{>{\raggedleft\arraybackslash\hspace{0pt}}p{#1}}
+%\newcolumntype{x}[1]{>{\centering\arraybackslash\hspace{0pt}}p{#1}}
+%
+%\usepackage{mathptmx}%use Times fonts if available on your TeX system
+%
+% insert here the call for the packages your document requires
+%\usepackage{latexsym}
+% etc.
+%
+% please place your own definitions here and don't use \def but
+% \newcommand{}{}
+%
+% Insert the name of "your journal" with
+% \journalname{myjournal}
+
+
+%make package refcheck compatible with package hyperref 
+\makeatletter
+\AtBeginDocument{%
+	\@ifpackageloaded{refcheck}{%
+		\@ifundefined{hyperref}{}{%
+			\let\T@ref@orig\T@ref
+			\def\T@ref#1{\T@ref@orig{#1}\wrtusdrf{#1}}%
+			\let\@refstar@orig\@refstar
+			\def\@refstar#1{\@refstar@orig{#1}\wrtusdrf{#1}}%
+			\DeclareRobustCommand\ref{\@ifstar\@refstar\T@ref}%
+		}%
+	}{}%
+}
+\makeatother
+
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "area_aggregation_seq_geoinformatica"
+%%% End: 
+
+
+
