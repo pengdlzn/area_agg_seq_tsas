@@ -4,7 +4,7 @@
 
 \begin{document}
 \title{Finding Optimal Sequences for Area Aggregation  
-	--\protect\\ 
+	---\protect\\ 
 	\Astar vs. Integer Linear Programming}
 %\titlenote{Produces the permission block, and
 %  copyright information}
@@ -80,7 +80,7 @@ For solving such a problem, standard approaches
 are the \Astar algorithm or integer linear programming.
 %We compare how the two methods solve our problem.
 To avoid long computing times, we allow the two methods to 
-return nonoptimal results.
+return non-optimal results.
 In addition, we present a greedy algorithm 
 as a benchmark.
 We tested the three methods with a
@@ -193,17 +193,21 @@ morphing-based methods for CMG.
 In order to morph from one polyline to another polyline,
 which respectively represent, say, roads on a larger-scale map 
 and a smaller-scale map, we first need to compute 
-corresponding points between them (e.g., \citealp{Cecconi2003,Noellenburg2008,Chazal2010BallMap,Deng2015,Li2017_Building,Li2017Annealing}).
+corresponding points between them 
+\parencite[e.g.,][]{Cecconi2003,Noellenburg2008,Chazal2010BallMap,
+Deng2015,Li2017_Building,Li2017Annealing}.
 Then morphing can be realized by interpolating a set of 
 intermediate polylines.
 % Among the methods of computing corresponding points,
 \textcite{Noellenburg2008} presented a method for computing an optimum
-correspondence between two given polylines according to some cost function.
+correspondence between two given polylines 
+according to some cost function.
 While straight-line trajectories 
 are often used for interpolation
-(e.g., \citealp{Cecconi2003,Deng2015}),
-\textcite{Whited2011BallMorph} considered four other alternatives, i.e., \emph{hat}, \emph{tangent}, 
-\emph{circular}, and \emph{parabolic} paths
+\parencite[e.g.,][]{Cecconi2003,Deng2015},
+\textcite{Whited2011BallMorph} considered four other alternatives, 
+i.e., \emph{hat}, \emph{tangent}, \emph{circular}, 
+and \emph{parabolic} paths
 based on so-called \emph{ball-map}
 \parencite{Chazal2010BallMap}.
 \textcite{Peng2013LSA} defined trajectories requiring that
@@ -257,7 +261,8 @@ try to fulfill soft ones as good as possible.
 Optimization for map generalization is important 
 not only because it finds optimal solutions,
 but also because it helps us to evaluate the quality of a model
-\parencite{Haunert2017Label,Haunert2008Assuring,Haunert2016Optimization}.
+\parencite{Haunert2017Label,
+Haunert2008Assuring,Haunert2016Optimization}.
 Recall that we wish to minimize the changes of types
 when aggregating areas one by one.
 A model could be to minimize 
@@ -271,7 +276,7 @@ to minimize the \emph{average} change over all the steps.
 Moreover, optimization is useful for evaluating heuristics.
 We need heuristics because
 many optimization problems cannot be solved efficiently
-(e.g., \citealp{HaunertWolff2010AreaAgg,Haunert2016Partition}).
+\parencite[e.g.,][]{HaunertWolff2010AreaAgg,Haunert2016Partition}.
 While heuristics can find some solutions in reasonable time,
 it is important to know the quality of 
 these solutions.
@@ -282,6 +287,14 @@ the quality of a heuristic
 by comparing its results with optimal solutions
 on small instances.
 
+
+\begin{figure}[tb]
+\centering
+\includegraphics{AreaAgg_example}
+\caption{The input and a possible output 
+	for an instance of 	our problem}
+\label{fig:AreaAgg_example}
+\end{figure}
 
 Optimization has been widely used in map generalization.
 For example, \textcite{Harrie1999} displaced objects 
@@ -330,19 +343,13 @@ administrative boundaries based on an ILP.
 Their aim was to minimize the number of edges
 while keeping the result boundaries close to the original ones
 and avoiding any intersection. 
-At the same time, every city, which is represented by a point, stays in the same face as before.
+At the same time, every city, which is represented by a point, 
+stays in the same face as before.
 
 
 
 %\todo{may cite \textcite{Bader2001Dissertation}}
 
-\begin{figure}[tb]
-\centering
-\includegraphics{AreaAgg_example}
-\caption{The input and a possible output 
-	for an instance of 	our problem}
-\label{fig:AreaAgg_example}
-\end{figure}
 
 
 \mypar{Optimization in \emph{continuous} map generalization}
@@ -443,7 +450,9 @@ the problem becomes complicated.
 We assume that there exist many-to-one relationships between the 
 areas of the
 start map and the areas of the goal map.
-This assumption is based on the fact that many algorithms (e.g., \citealp{HaunertWolff2010AreaAgg,vanSmaalen2003,Oehrlein2017Aggregation})
+This assumption is based on the fact that many algorithms 
+\parencite[e.g.,][]{HaunertWolff2010AreaAgg,
+vanSmaalen2003,Oehrlein2017Aggregation}
 that aggregate land-cover areas
 result in many-to-one relationships.
 The input and the generalized results of these methods 
@@ -721,8 +730,8 @@ that has the most similar type
 (\fig\ref{fig:AreaAgg_Preferences}e).
 To keep our aggregation problem independent of user preferences,
 our cost function takes two aspects into account: 
-one is based on semantics and 
-the other is based on shape.
+one based on semantics and 
+the other based on shape.
 %
 In terms of semantics, we require that 
 the \emph{type} of a land-cover area changes 
@@ -741,7 +750,9 @@ if it is more compact (less clutter).
 We also consider the total \emph{length} 
 of the interior boundaries as an alternative compactness:
 we consider a subdivision~\Pnode as more compact than
-another subdivision~$P_{t,i'}$ if the total length of the interior boundaries of~\Pnode is less than that of~$P_{t,i'}$.
+another subdivision~$P_{t,i'}$ 
+if the total length of the interior boundaries of~\Pnode 
+is less than that of~$P_{t,i'}$.
 We add this alternative because we want to make a comparison 
 involving an ILP, 
 where a \emph{linear} cost function must be used.
@@ -753,7 +764,7 @@ is not sufficiently precise
 to describe compactness \parencite{Young1988},
 it is often used as a reasonable replacement
 when compactness is considered in an ILP
-(e.g., \citealp{Minas2016,Wright1983}).
+\parencite[e.g.,][]{Minas2016,Wright1983}.
 \textcite{HaunertWolff2010AreaAgg} employed 
 the centroids of a set of land-cover areas.
 One of their costs is the sum of the distances 
@@ -1160,7 +1171,8 @@ is based on regular polygons.
 The more edges a regular polygon has, the more compact it is.
 We assume that at each step 
 we aggregate the two patches that are the least compact.
-Moreover, we assume that the shared boundary of the two patches  has the least number of edges.
+Moreover, we assume that the shared boundary of the two patches  
+has the least number of edges.
 We use $\mathcal{N}_\mathrm{ext}$ to 
 denote the edge number of the region's exterior boundaries.
 As the exterior boundaries will not be changed by aggregation, 
@@ -1247,7 +1259,8 @@ C(\Psnode)\cup
 We compute the estimated average compactness 
 by calculating the average 
 of the values in set~$C(P_{s+1,j})$.
-Finally, we compute the estimated cost of compactness for subdivision~$P_{s+1,j}$ by \eq\ref{eq:f_comp}.
+Finally, we compute the estimated cost of compactness 
+for subdivision~$P_{s+1,j}$ by \eq\ref{eq:f_comp}.
 
 For subdivision~\Pnode, let
 $(\Pnode=P_{t,i'_t}, P_{t+1,i'_{\tstar+1}}, 
@@ -1356,6 +1369,8 @@ h_2(\Pnode)=
 +\lambda h_{\mathrm{lgth}}(\Pnode). \nonumber
 \end{equation}
 
+
+
 \section{Integer Linear Programming}
 \label{sec:AreaAgg_ILP}
 
@@ -1365,11 +1380,11 @@ subject to a set of \emph{linear constraints},
 with some \emph{variables}.
 For example, suppose that we are selling coffee.
 We have~$3.5\,$kg of coffee powder and~$10\,$kg of water.
-We mix the powder and the water to provide coffee with 
-two kinds of intensity in terms of mass:~$40\%$ and~$20\%$.
+We mix the powder and the water to provide two kinds coffee 
+with different intensities in terms of mass:~$40\%$ and~$20\%$.
 The profits of the two kinds of coffee 
-are respectively~$5\,$\euro and~$4\,$\euro.
-We want to maximize the total profit of selling coffee.
+are respectively~$5\,$\euro~and~$4\,$\euro.
+Our aim is to maximize the total profit of selling coffee.
 If we offer respectively~$x\,$kg and~$y\,$kg 
 of the two kinds of coffee,
 then~$x$ and~$y$ are our variables.
@@ -1407,7 +1422,7 @@ then we are able to achieve a larger value for~$5x+4y$.
 In order to maximize the profit, 
 we move the dashed line to the upper right as much as possible
 and at the same time make sure that 
-the it still intersects with the gray area.
+it still intersects with the gray area.
 Note that if the dashed line 
 does not intersect with the gray area,
 then there is no feasible pair of~$(x,y)$ 
@@ -1416,16 +1431,16 @@ As a result, we get the optimal solution
 when the dashed line hits point~$A$,
 where the profit is~$5 \cdot 4 + 4 \cdot 9.5 =58\,$\euro.
 \textcite{Karmarkar1984LP}
-proved that an LP can be solved in a polynomial time.
+proved that an LP can be solved in polynomial time.
 
 Now we change our problem a bit.
-We assume that we want to sell coffee in bottles,
-where each bottle contains exactly~$1\,$kg of coffee 
-with intensity either~$40\%$ or~$20\%$.
-Our question becomes how many bottles of each kind of coffee
+We wish to sell coffee in jugs,
+where each jug contains exactly~$1\,$kg of coffee 
+with intensity~$40\%$ or~$20\%$.
+Our question becomes how many jugs of each kind of coffee
 we should sell in order to maximize the profit.
 If we sell the two kinds of coffee 
-respectively~$x'$ and~$y'$ bottles,
+respectively~$x'$ and~$y'$ jugs,
 then our problem becomes:
 \begin{alignat*}{3}
 &&\text{maximize} 	\quad	&& 5x'+4y' 		&			\\
@@ -1434,10 +1449,10 @@ then our problem becomes:
 &&					\quad	&& x', y' 		&\ge 0, 	\\
 &&\text{and} 		\quad	&& x', y'		&\in \mathbb{Z}.
 \end{alignat*}
-For this problem, only the pairs of~$(x,y)$ 
+For this problem, only the pairs of~$(x',y')$ 
 represented by the gray dots in \fig\ref{fig:AreaAgg_ILPIllustration}b 
 are feasible solutions
-(point~$A$ is no longer an optimal solution in this case).
+(point~$A$ is no longer a solution in this case).
 In order to maximize our profit,
 we should move the dashed line to the upper right 
 as much as possible
@@ -1450,7 +1465,7 @@ Despite the fact, there are
 mathematical solvers yielding optimal solutions
 for some NP-complete problems in reasonable time
 \parencite{Haunert2017Label}.
-Also, by using these solvers we profit 
+Also, by using these solvers we benefit 
 from every improvement, by their producers,
 for the same class of problems
 \parencite{Haunert2017Label}.
@@ -1482,7 +1497,7 @@ we are going to use binary variables in our ILP.
 \begin{figure*}[tb]
 \centering
 \includegraphics[page=4]{AreaAgg_ILP}
-\caption{Example of linear programming (a)
+\caption{Examples of linear programming (a)
 	and integer linear programming (b). 
 }
 \label{fig:AreaAgg_ILPIllustration}
@@ -1535,7 +1550,8 @@ our rules for area aggregation.
 	show the aggregation steps and
 	the dotted lines represent 
 	the removed boundaries by the aggregation steps.
-	There are some blank spaces because there is no corresponding variable at the specific times.
+	There are some blank spaces because 
+	there is no corresponding variable at the specific times.
 }
 \label{fig:AreaAgg_Variables}
 \end{figure*}
@@ -1740,7 +1756,8 @@ Integrating~$D(t)$ into \eq\ref{eq:F_length_raw}, we have
 \label{sub:AreaAgg_Constraints}
 
 In order to formulate our aggregation problem as an ILP, 
-we restrict the variables introduced in \sect\ref{sub:AreaAgg_variables} 
+we restrict the variables introduced in 
+\sect\ref{sub:AreaAgg_variables} 
 by setting up constraints.
 Recall that the intended meaning 
 of~$x_{t,p,r}=1$ is that, at time~$t$, 
@@ -2148,7 +2165,8 @@ Consequently, we use the constraint
 %if we do \embld{\sum_{r\in P \setminus \{o\}}
 &\eqquad
 \embrd[S]{w_{t,o}} \le 
-\embld[T]{\displaystyle\sum_{r\in P \setminus \{o\}} \left(y_{t+1,o,o,r} +y_{t+1,r,r,o}\right)} \inquad
+\embld[T]{\displaystyle\sum_{r\in P \setminus \{o\}} 
+\left(y_{t+1,o,o,r} +y_{t+1,r,r,o}\right)} \inquad
 \forall t \in {T}\setminus \{n\}, 
 \forall o \in P. &
 \end{flalign}
@@ -2218,8 +2236,10 @@ Our prototype is open access on
 GitHub\footnote{
 	\url{https://github.com/IGNF/ContinuousGeneralisation},
 	Accessed: Jun 18, 2018.}.
-Our computer ran
-Windows~10 on Intel(R) Core(TM) i7-6700 CPU @~$3.40\,$GHz with~$16\,$GB RAM.
+We ran our case study
+under 64-bit Windows~10 
+on Intel(R) Core(TM) i7-6700 CPU @~$3.40\,$GHz with~$4$ cores;
+the computer has $16\,$GB RAM.
 We measured processing time 
 by the built-in C\# class \emph{Stopwatch}.
 As required by ArcObjects SDK~10.6.0,
@@ -2288,7 +2308,8 @@ the resulting cost function for type change is a metric.
 		at scale $1:250{,}000$}
 \end{subfigure}
 %
-%	\par\vspace{\intextsep} %Leave a gap between the two figures
+%It doesn't work to directly use 
+%\vspace{\baselineskip} for subfigures.
 \par\vspace{\baselineskip} %Leave a gap	figures
 %
 \begin{subfigure}{\textwidth}
@@ -2329,7 +2350,7 @@ For \Astar, we overestimated
 whenever we could not find a solution after 
 having visited~$W$ nodes 
 (see \sect\ref{sec:AreaAgg_AStar}).
-We tried $W=200{,}000$ and $W=400{,}000$
+We tried~$W=200{,}000$ and~$W=400{,}000$
 (if we could use more main memory, 
 then we could test by using some larger~$W$). 
 The results are shown in 
@@ -2356,6 +2377,8 @@ both algorithms have found feasible solutions
 Table~\ref{tab:AreaAgg_CaseStudy1_Statistics}).
 Although some of the feasible solutions may also be optimal,
 we cannot verify only from the cost values.
+
+
 \begin{table*}[tb]
 %\small	
 \centering
@@ -2364,8 +2387,12 @@ we cannot verify only from the cost values.
 	For \Astar, we used two settings, 
 	i.e.,~$W=200{,}000$ and~$W=400{,}000$.
 	%
-	Symbol~\#over is the number and percentage of regions
-	(out of~$N=734$) that needed overestimation.
+	Symbol~\#OS represents the number of regions 
+    that we obtained optimal solutions.   
+	%
+	Symbol~\#FS represents 
+    the number and the percentage of regions (out of~$N=734$) 
+    that we obtained feasible (non-optimal) solutions.
 	%
 	Variable~$k_\mathrm{sum}$ is 
 	the total number of repetitions.
@@ -2386,35 +2413,42 @@ we cannot verify only from the cost values.
 	The percentage in the
 	time column is the fraction of the total
 	runtime spent on solving the instances
-	that needed overestimation.
+	that we obtained feasible solutions.
+    For \Astar, the time needed for overestimation
+    is included.
 }
 \label{tab:AreaAgg_CaseStudy1_Statistics}
 \setlength{\tabcolsep}{0.7ex}
-\begin{tabular}{lCRCCCCCd{3.7}}
-	\toprule
-	\multicolumn{1}{l}{Methods} &
-	\multicolumn{1}{c}{\#over} &
-	\multicolumn{1}{r}{$k_\mathrm{sum}$} &  
-	\multicolumn{1}{c}{\#nodes} & 
-	\multicolumn{1}{c}{\#arcs} & 
-	\multicolumn{1}{c}{$\sum g_\mathrm{type}$} & 
-	\multicolumn{1}{c}{$\sum g_\mathrm{comp}$} & 
-	\multicolumn{1}{c}{$\sum g_1$} & 
-	\multicolumn{1}{c}{Time (min)} \\ 
-	\midrule
-	Greedy 	&     &     & 5.5\cdot 10^3 & 4.8\cdot 10^3 
-	& 53.2 & 188.2 & 120.7 & 1'1\\
-	%
-	\Astar$_{\!\!200{,}000}$	&  32~(4.4\%) & 102 &  3.6\cdot 
-	10^6 
-	&    5.7\cdot 10^6	
-	& 51.4 & 183.2 & 117.3 & 55'5~(93.1\%)\\
-	%
-	\Astar$_{\!\!400{,}000}$	&  29~(4.0\%) &   89 &  6.5\cdot 
-	10^6 
-	&    9.8\cdot 10^6
-	& 51.4 & 183.1 & 117.2 & 102'6~(95.5\%) 
-	\\ \bottomrule			
+\begin{tabular}{lRRRCCCCCd{3.7}}
+\toprule
+\multicolumn{1}{l}{Methods} &
+\multicolumn{1}{l}{\#OS} &
+\multicolumn{1}{c}{\#FS} &
+\multicolumn{1}{r}{$k_\mathrm{sum}$} &  
+\multicolumn{1}{c}{\#nodes} & 
+\multicolumn{1}{c}{\#arcs} & 
+\multicolumn{1}{c}{$\sum g_\mathrm{type}$} & 
+\multicolumn{1}{c}{$\sum g_\mathrm{comp}$} & 
+\multicolumn{1}{c}{$\sum g_1$} & 
+\multicolumn{1}{c}{Time (min)} \\ 
+\midrule
+Greedy 	& 408 
+&326~(44.4\%) 
+&             &5.5\cdot 10^3   &4.8\cdot 10^3   
+&53.2         &188.2           &120.7           &1'2~(44.6\%)\\
+%
+%
+\Astar$_{\!\!200{,}000}$	& 702 
+&  32~(\parbox{\widthof{$4$}}{$\,$}$4.4\%$) 
+& 102 &  3.6\cdot 10^6 &    5.7\cdot 10^6	
+& 51.4 & 183.2 & 117.3 & 55'5~(93.1\%)\\
+%
+%
+\Astar$_{\!\!400{,}000}$	& 705 
+&  29~(\parbox{\widthof{$4$}}{$\,$}$4.0\%$)
+&  89 &  6.5\cdot 10^6 &    9.8\cdot 10^6
+& 51.4 & 183.1 & 117.2 & 102'6~(95.5\%) 
+\\ \bottomrule			
 \end{tabular}
 \end{table*}
 
@@ -2679,23 +2713,42 @@ the total cost of the solutions by the greedy algorithm.
 \label{tab:AreaAgg_CaseStudy2_Statistics}
 %	\includegraphics[page=1]{AreaAgg_CaseStudy2_Plot}
 \setlength{\tabcolsep}{0.7ex}
-\begin{tabular}{lCRCCCCCd{3.7}}
-	\toprule
-	\multicolumn{1}{l}{Methods} &
-	\multicolumn{1}{c}{\#over} &
-	\multicolumn{1}{r}{$k_\mathrm{sum}$} &  
-	\multicolumn{1}{c}{\#nodes} & 
-	\multicolumn{1}{c}{\#arcs} & 
-	\multicolumn{1}{c}{$\sum g_\mathrm{type}$} & 
-	\multicolumn{1}{c}{$\sum g_\mathrm{comp}$} & 
-	\multicolumn{1}{c}{$\sum g_1$} & 
-	\multicolumn{1}{c}{Time (min)} \\ 
-	\midrule
-	Greedy 						&     			&    	& 5.5\cdot 10^3 & 4.8\cdot 10^3 & 53.0 	& 858.5 & 455.8 & 1'3			\\
-	%
-	\Astar$_{\!\!200{,}000}$	& 39~(5.3\%)	& 150 	& 3.7\cdot 10^6 & 7.3\cdot 10^6 & 52.0 	& 824.5 & 438.2 & 47'2~(92.1\%)	\\
-	%
-	ILP							&  			 	&		&				&				&		&		&		& 456'8			\\ \bottomrule
+\begin{tabular}{lRRRCCCCCd{3.7}}
+\toprule
+\multicolumn{1}{l}{Methods} &
+\multicolumn{1}{l}{\#OS} &
+\multicolumn{1}{c}{\#FS} &
+\multicolumn{1}{r}{$k_\mathrm{sum}$} &  
+\multicolumn{1}{c}{\#nodes} & 
+\multicolumn{1}{c}{\#arcs} & 
+\multicolumn{1}{c}{$\sum g_\mathrm{type}$} & 
+\multicolumn{1}{c}{$\sum g_\mathrm{comp}$} & 
+\multicolumn{1}{c}{$\sum g_1$} & 
+\multicolumn{1}{c}{Time (min)} \\ 
+\midrule
+Greedy 		 &430             
+&304~(41.4\%)    
+&            &5.5\cdot 10^3   &4.8\cdot 10^3   
+&53.0        &858.5           &455.8           &1'2~(41.5\%)\\
+%
+%
+\Astar$_{\!\!200{,}000}$	& 695
+& 39~(\parbox{\widthof{$4$}}{$\,$}$5.3\%$)	
+& 150 	& 3.7\cdot 10^6 & 7.3\cdot 10^6 
+& 52.0 	& 824.5 & 438.2 & 53'6~(91.8\%)	\\
+%
+%
+ILP$_{112\,\mathrm{s}}$		& 453
+& 66~(\parbox{\widthof{$4$}}{$\,$}$9.0\%$)  			 	
+&		&				&				
+&		&		&		& 470'4~(26.2\%)\\
+%
+%
+ILP$_{300\,\mathrm{s}}$		& 496
+& 51~(\parbox{\widthof{$4$}}{$\,$}$6.9\%$)  			 	
+&		&				&				
+&		&		&		& 795'4			\\ 
+\bottomrule
 \end{tabular}
 \end{table*}
 
@@ -2950,7 +3003,9 @@ to keep important land-cover areas for a longer time
 (such as a settlement surrounded by farmlands).
 This requirement can be achieved by incorporating the idea of
 \textcite{Dilo2009tGAP}.
-They gave each type a weight, then defined the importance of a patch by the product of the area size and the type weight.
+They gave each type a weight, 
+then defined the importance of a patch 
+by the product of the area size and the type weight.
 While in our method, we used only the area size as importance.
 %
 Another requirement is that 

@@ -68,9 +68,10 @@
 %\usepackage{todonotes}
 %\setlength{\marginparwidth}{3cm} %set the width of todonotes
 \usepackage[defaultlines=4,all]{nowidow}%forbid widow or orphan
+\usepackage{calc}
 
-
-% Hack to try to make acmart work with biblatex: https://tex.stackexchange.com/questions/37076/is-it-possible-to-load-biblatex-with-a-class-that-has-already-loaded-natbib
+% Hack to try to make acmart work with biblatex: 
+%https://tex.stackexchange.com/questions/37076/is-it-possible-to-load-biblatex-with-a-class-that-has-already-loaded-natbib
 \let\citename\relax
 \RequirePackage[
 backend=bibtex,
@@ -92,7 +93,8 @@ maxcitenames=2, %the author names appearing in text
 giveninits=true,
 terseinits=true,%remove periods after initials of first names
 isbn=false,
-%doi=true,url=false,eprint=false,
+%doi=false,url=false,
+eprint=false,
 %dashed=false,
 %useprefix=false,%sort bibliography use prefix like "van"
 natbib=true,
@@ -101,21 +103,25 @@ language=american,
 abbreviate=true, dateabbrev=true,
 ]{biblatex}
 
-%if a reference has doi, then only print doi in bibliography;
-%otherwise, only print eprint; otherwise, print url
+%if a reference has doi, then we print only doi in bibliography;
+%otherwise, we print only url
+%we don't use eprint
+%we must deactivate eprint by using "eprint=false"
 \renewbibmacro*{doi+eprint+url}{% 
-	\iftoggle{bbx:url} 						{\iffieldundef{doi}{\usebibmacro{url+urldate}}{}} 
+	\iftoggle{bbx:url} 
+	{\iffieldundef{doi}{\usebibmacro{url+urldate}}{}} 
 	{}% 
-	\newunit\newblock 
-	\iftoggle{bbx:eprint} 
-	{\usebibmacro{eprint}} 
-	{}% 
+	%	\newunit\newblock 
+	%	\iftoggle{bbx:eprint} 
+	%	{\usebibmacro{eprint}} 
+	%	{}% 
 	\newunit\newblock 
 	\iftoggle{bbx:doi} 
 	{\printfield{doi}} 
-	{}}
+	{}}	
 
-%[abbreviate=true, dateabbrev=true, isbn=true, doi=true, urldate=comp, url=true, maxbibnames=9, backref=false, backend=bibtex, style=ACM-Reference-Format, language=american,natbib]{biblatex}
+
+
 
 \addbibresource{Reference/BibReference.bib}
 
@@ -169,7 +175,7 @@ abbreviate=true, dateabbrev=true,
 \usepackage{amsfonts}  %for \mathbb{Z}
 \usepackage{amssymb} % for \smallsetminus
 \usepackage{array}  %for define the fomats of columns in a table
-\usepackage{dcolumn}
+\usepackage{dcolumn} %for \newcolumntype{d}[1]{D{'}{.}{#1}}
 \usepackage[T1]{fontenc}
 \usepackage{multirow}
 \usepackage{makecell}
@@ -177,7 +183,7 @@ abbreviate=true, dateabbrev=true,
 \usepackage{adjustbox}
 \usepackage{capt-of}
 \usepackage{subdepth} %fix the height problem of subscript
-
+\usepackage{transparent}
 
 
 
@@ -279,8 +285,11 @@ abbreviate=true, dateabbrev=true,
 \newcommand{\eqquad}{\myquad[6]}
 \newcommand{\inquad}{\qquad}
 
-%M or N are default tags. The boxes using the same tag will have the same length. The length is the maximum length of all the equations in the boxes that use the same tag
-%see also https://tex.stackexchange.com/questions/381502/how-to-align-text-in-multiple-separate-align-environments
+%M or N are default tags. 
+%The boxes using the same tag will have the same length. 
+%The length is the maximum length of all the equations 
+%in the boxes that use the same tag; see also 
+%https://tex.stackexchange.com/questions/381502/how-to-align-text-in-multiple-separate-align-environments
 \usepackage{eqparbox}
 \newcommand{\embl}[2][M]
 {\eqmakebox[#1][l]{$#2$}}
@@ -311,10 +320,13 @@ abbreviate=true, dateabbrev=true,
 % math-mode version of "c" column type
 \newcolumntype{C}{>{$}c<{$}}
 %align numbers by decimal points in table; 
-%need package {dcolumn} and {array} 
+%need package {dcolumn} and {array}
+%see http://www.ctex.org/documents/packages/table/dcolumn.pdf 
 \newcolumntype{d}[1]{D{'}{.}{#1}}
+\newcolumntype{s}[1]{D{'}{~}{#1}}
 
 %x:l, y:c, z:r, with specified width
+%place text in a cell at top (b), middle (m), or bottom (p)
 \newcolumntype{x}[1]
 {>{\raggedright\arraybackslash\hspace{0pt}}m{#1}}
 \newcolumntype{y}[1]
