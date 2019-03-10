@@ -2,10 +2,12 @@
 \input{area_agg_seq_tsas_setting}
 
 
+\fancyhead[LO]{Finding Optimal Sequences for Area Aggregation}
+
 \begin{document}
-\title{Finding Optimal Sequences for Area Aggregation  
-	---\protect\\ 
-	\Astar vs. Integer Linear Programming}
+\title{Finding Optimal Sequences for Area Aggregation---\protect\\ 
+	\Astar vs. Integer Linear Programming
+    }
 %\titlenote{Produces the permission block, and
 %  copyright information}
 %\subtitle{Extended Abstract}
@@ -117,7 +119,7 @@ users need to have access to maps at different scales.
 In order to generate these maps,
 national mapping agencies produce a base map
 and then derive maps at smaller scales by 
-\emph{map generalization}
+\emph{map generalization}.
 More specifically, 
 map generalization is the process of extracting and arranging
 geographical information from detailed data in order to produce maps
@@ -465,7 +467,7 @@ Although \textcite{HaunertWolff2010AreaAgg}
 attain results of high quality, 
 they do not produce land-cover maps at intermediate scales.
 
-In this chapter, we try to find an optimal sequence
+In this paper, we try to find an optimal sequence
 to aggregate the land-cover areas on the start map
 one by one until we arrive the goal map.
 We first independently deal with each region of the goal map 
@@ -488,6 +490,8 @@ We formally define our problem,
 introduce the basic concepts of our method, 
 and analyze the size of our model in a worst-case scenario
 (\sect\ref{sec:AreaAgg_Preliminaries}).
+We prove that our problem is NP-hard
+(\sect\ref{sec:AreaAgg_NP-hardness}).
 We define our cost functions in 
 \sect\ref{sec:AreaAgg_CostFunctions}.
 Then, we compare three methods for finding aggregation sequences.
@@ -514,7 +518,7 @@ uses a dataset of the German topographic database ATKIS
 In the conclusions, we show possible ways to improve our 
 methods in \sect\ref{sec:AreaAgg_Conclusions}. 
 
-We do not deal with simplifying polylines in this chapter.
+We do not deal with simplifying polylines in this paper.
 The simplification can be handled separately from the
 aggregation of areas, for example, 
 by using one method of 
@@ -609,18 +613,21 @@ an \emph{aggregation sequence}.
 
 
 \mypar{Model}
-We consider a directed graph $G$, 
+We consider a directed graph $G_\mathrm{S}$, 
 which we call the \emph{subdivision graph} 
 (see \fig\ref{fig:AreaAgg_SubdivisionName}). 
-The node set $V$ of~$G$ contains a node for every
-possible map (or \emph{subdivision}), including the start map, all
-possible intermediate-scale maps, and the goal map.
-The arc set~$E$ of~$G$ contains an arc $(\Pnode, P_{t+1,j})$ 
-between any two maps~$\Pnode$ and~$P_{t+1,j}$ in~$V$ 
+The node set $V_\mathrm{S}$ of~$G_\mathrm{S}$ 
+contains a node for every
+possible map (or \emph{subdivision}), including the start map, 
+all possible intermediate-scale maps, and the goal map.
+The arc set~$E_\mathrm{S}$ of~$G_\mathrm{S}$ 
+contains an arc $(\Pnode, P_{t+1,j})$ 
+between any two maps~$\Pnode$ and~$P_{t+1,j}$ in~$V_\mathrm{S}$ 
 if~$P_{t+1,j}$ can be reached from~$\Pnode$ 
 with a single aggregation operation,
 involving a smallest area.
-Then, any directed path in~$G$ from the start map to the goal map
+Then, any directed path in~$G_\mathrm{S}$ 
+from the start map to the goal map
 defines a possible aggregation sequence.
 Our idea is to obtain an optimal aggregation sequence through 
 computing a minimum-weight path from the start to the goal.
@@ -629,7 +636,7 @@ set such that a minimum-weight start--goal
 path does actually correspond to an aggregation sequence of 
 maximum cartographic quality.  
 Moreover, putting the idea to practice is far from trivial 
-since graph~$G$ can be huge as we will argue later.
+since graph~$G_\mathrm{S}$ can be huge as we will argue later.
 We compare a greedy algorithm, \Astar, and an ILP-based algorithm
 in finding such paths.
 Note that we only know 
@@ -640,7 +647,7 @@ We generate a subdivision (node) only when we want to visit it.
 \begin{figure}[tb]
 \centering
 \includegraphics[page=3]{AreaAgg_Preliminaries}
-\caption{The subdivision graph~$G$. 
+\caption{The subdivision graph~$G_\mathrm{S}$. 
 	The nodes of the graph are the subdivisions. 
 	There is an arc	from subdivision~\Pnode 
 	to subdivision~${P}_{t+1,j}$ 
@@ -679,8 +686,26 @@ contains every possible subdivision~\Pnode\ with~$n-t+1$ patches
 \label{fig:AreaAgg_ExponentialSize}
 \end{figure}
 
+Sometimes, we need a graph to represent the adjacencies of
+the land-cover areas in a subdivision,
+we call such a graph $G_\mathrm{A}$
+(see \fig\ref{fig:AreaAgg_Variables_Graph}). 
+
+
+\begin{figure}[tb]
+\centering
+\includegraphics[page=3]{AreaAgg_ILP}
+\caption{The graph of a subdivision.
+	Each polygon of the subdivision is represented as a node 
+	in the graph.
+	There is an edge between two nodes
+	if the corresponding two polygons are adjacent.
+}
+\label{fig:AreaAgg_Variables_Graph}
+\end{figure} 
+
 \mypar{Exponential lower bound}
-We now analyze the size of subdivision graph~$G$.
+We now analyze the size of subdivision graph~$G_\mathrm{S}$.
 Our analysis is inspired by \textcite{Keane1975Size},
 where we also use a row of~$n$~areas.
 In our instance
@@ -697,6 +722,137 @@ For this, the number of choices is~$
 That is to say, the size of our model
 has an exponential lower bound.
 
+\section{NP-hardness Proof}
+\label{sec:AreaAgg_NP-hardness}
+
+Although we have shown that the graph of subdivisions
+has an exponential size,
+one may develop a clever algorithm 
+to find an optimal sequence efficiently.
+In the following, we prove that 
+finding such a sequence is indeed NP-hard.
+In the proof, we neglect the cost of compactness or the cost of length.
+Considering one of the two costs 
+will make the finding even more difficult.
+
+
+\newtheorem{thm}{Theorem}
+\begin{thm}
+\textsc{AreaAggregationSequence} is NP-hard 
+even if we only consider the cost of type change.
+\end{thm}
+
+\begin{proof}
+Our NP-hardness proof is by reduction from 
+the NP-complete problem \textsc{PlanarVertexCover}, 
+which is to decide, for a given 
+planar graph~$G_\mathrm{A} = (V_\mathrm{A},E_\mathrm{A})$, 
+whether there exists a vertex cover 
+with at most a given number~$k_\mathrm{A}$ of vertices. 
+For an instance of \textsc{PlanarVertexCover}
+(\fig\ref{fig:AreaAgg_Reduction}a), 
+we define a corresponding instance of \textsc{AreaAggregationSequence}
+whose start map consists of red, black, and white areas and 
+whose goal map consists of only one large red patch.
+The adjacency graphs of the two maps are illustrated 
+in \figs\ref{fig:AreaAgg_Reduction}b and~\ref{fig:AreaAgg_Reduction}c, 
+where the colors of the vertices represent 
+the colors of the corresponding areas.
+More precisely, for each vertex of~$G_\mathrm{A}$
+in \fig\ref{fig:AreaAgg_Reduction}a, 
+we define a red vertex and a black vertex, 
+which we connect with an edge. 
+For each edge of~$G_\mathrm{A}$, 
+we define two white vertices and 
+connect them with the two black vertices
+(\fig\ref{fig:AreaAgg_Reduction}b).
+
+\begin{figure}[h]
+\centering
+\includegraphics[page=1]{AreaAgg_NPHard}
+\caption{The reduction for our NP-hardness proof.
+    The dashed polygon in (c) shows 
+    that the vertices are merged.}
+\label{fig:AreaAgg_Reduction}
+\end{figure}
+
+We define the weights of the vertices 
+in \fig\ref{fig:AreaAgg_Reduction}b as follows:
+\begin{itemize}
+\item Every white vertex has weight~$1$.
+\item Every black vertex has weight~$2$.
+\item Every red vertex has weight~$2|V_\mathrm{A}| + 2|E_\mathrm{A}|$,
+which is equal to the total weight of all white and black vertices.
+\end{itemize}
+Since in each aggregation step, 
+we require the smallest area to be aggregated with one of its neighbors, 
+our definition of the weights to a certain degree determines 
+the order in which the vertices are selected:
+\begin{itemize}
+\item \emph{Phase I}: In each of the first~$2|E_\mathrm{A}|$ steps, 
+a white vertex is selected and merged with one of its neighbors, 
+such that the white vertex receives the neighbor's color or vice versa.
+\item \emph{Phase II}: In each of the next~$|V_\mathrm{A}|$ steps, 
+a non-red vertex is selected and merged with one of its neighbors.
+\item \emph{Phase III}: $|V_\mathrm{A}|-1$ steps remain to reach the goal map.
+\end{itemize}
+
+To complete the reduction, 
+we need to define the costs of color changes. 
+For any color change, 
+we charge one unit of cost per unit weight.
+Due to our construction, Phases II and III can be accomplished with
+a total cost of~$2|V_\mathrm{A}|+2|E_\mathrm{A}|$, 
+no matter how Phase I is accomplished.
+This is because, after Phase I, 
+every non-red patch will be adjacent to a red patch (vertex).
+Thus, if any non-red patch becomes selected in Phase II, 
+it can aggregate with a red patch (vertex) and 
+receive the color red. 
+This implies that Phase II costs $2|V_\mathrm{A}|+2|E_\mathrm{A}|$ 
+(which is equal to the total weight of 
+all initially white and black vertices) and, 
+since after Phase II all patches are red, 
+Phase III does not cause any additional cost.  
+It is also clear that 
+there is no cheaper way to accomplish Phases II and III,
+since it is impossible to color a vertex red in Phase I.
+Consequently, since the total cost of Phases II and III is fixed, 
+it is only interesting to ask 
+at which cost Phase I can be accomplished.
+It turns out that, if $G_\mathrm{A}$ 
+has a vertex cover $C_\mathrm{A} \subseteq V_\mathrm{A}$, 
+then Phase I can be accomplished with cost $2|C_\mathrm{A}|$;
+only the black vertices corresponding to vertices in~$C_\mathrm{A}$ 
+need to change their color from black to white, and 
+each of them has weight~$2$ (see \fig\ref{fig:reduction2}).
+To summarize, if graph~$G_\mathrm{A}$ has a vertex cover~$C_\mathrm{A}$, 
+then the corresponding instance of \textsc{AreaAggregationSequence} 
+has a solution of 
+total cost~$2|C_\mathrm{A}|+2|V_\mathrm{A}|+2|E_\mathrm{A}|$.
+
+It remains to be shown that, 
+if $C_\mathrm{A}^*$ is a minimum vertex cover of $G_\mathrm{A}$, 
+then there is no solution with total cost 
+less than $2|C_\mathrm{A}^*|+2|V_\mathrm{A}|+2|E_\mathrm{A}|$.
+To see why, we assume that such a solution exists.
+If we keep the black color of a vertex from $C_\mathrm{A}^*$ 
+(the total cost decreases by $2$),
+then we will need to at least change two white vertices
+to black vertices
+(the total cost increases by $2$ at least).
+Therefore, we have found a contradiction to our assumption.
+
+\begin{figure}[h]
+\centering
+\includegraphics[page=2]{AreaAgg_NPHard}
+\caption{The situation after Phase I has been conducted 
+    such that all black vertices corresponding to a vertex cover 
+    of~$G_\mathrm{A}$ have been recolored white.
+    The dashed polygons show that the vertices are merged.}
+\label{fig:reduction2}
+\end{figure}
+\end{proof}
 
 \section{Cost Functions}
 \label{sec:AreaAgg_CostFunctions}
@@ -828,7 +984,7 @@ as the cost function of type change
 \textcite[\chap2]{Choudhary1992Elements}
 shows the definition of a metric.
 A metric distance is symmetric, 
-which is different from the non-symmetric one used in
+which is different from the asymmetric one used in
 \textcite{Dilo2009tGAP}.
 In their definition, for example, 
 the distance from type \emph{building} to type \emph{road} is~$0.5$,
@@ -1040,7 +1196,7 @@ The cost of a whole sequence can be computed by
 \sect\ref{sec:AreaAgg_Preliminaries} has shown that
 the size of finding an optimal aggregation sequence 
 can be exponential.
-That is to say, the graph~$G$---our search space---can 
+That is to say, the graph~$G_\mathrm{S}$---our search space---can 
 be of exponential size.
 In order to avoid computing the whole graph explicitly,
 we use the \Astar algorithm \parencite{Hart1968,PatelAStar}.
@@ -1103,7 +1259,7 @@ We propose another strategy that fits our problem.
 We first try finding an optimal solution by \Astar. 
 If we fail to find one after 
 we have visited a predefined number, 
-say,~$W$ of nodes of graph~$G$,
+say,~$W$ of nodes of graph~$G_\mathrm{S}$,
 then we restart.
 In the retrying, we overestimate the first~$K$ steps 
 starting at each node
@@ -2073,17 +2229,7 @@ that is more intuitive for our problem
 since we aggregate step by step.
 
 
-\begin{figure}[tb]
-\centering
-\includegraphics[page=3]{AreaAgg_ILP}
-\caption{The graph of a subdivision.
-	Each polygon of the subdivision is represented as a node 
-	in the graph.
-	There is an edge between two nodes
-	if the corresponding two polygons are adjacent.
-}
-\label{fig:AreaAgg_Variables_Graph}
-\end{figure} 
+
 
 We aggregate two patches only if they are neighbors.
 To ensure this, we need binary variable~$c_{t,p,o,r}$
@@ -2389,7 +2535,7 @@ the distance is the ``number of edges'' that
 we need to travel from one node to another node in the tree of 
 type hierarchy\footnote{More information 
     about land-cover types can be found at 
-	\url{http://www.atkis.de/dstinfo/dstinfo2.dst_gliederung},
+%	\url{http://www.atkis.de/dstinfo/dstinfo2.dst_gliederung},
 	Accessed: Nov 1, 2017.}
 (see \fig\ref{fig:AreaAgg_TypeDistances}). 
 For example, the distance from type \emph{village}
@@ -2468,7 +2614,7 @@ Table~\ref{tab:AreaAgg_CaseStudy1_Statistics}.
 %
 Comparing to \Astar, 
 the greedy algorithm visited 
-fewer nodes and arcs in graph~$G$ 
+fewer nodes and arcs in graph~$G_\mathrm{S}$ 
 and used much less time.
 However, \Astar managed to find solutions with 
 lower total cost,~$117.3$ (or~$117.2$), 
@@ -2996,7 +3142,7 @@ Using cost function~$g_2$, we had a similar problem.
 The subdivision with~$7$ patches is such an example,
 where we expect the result of 
 \fig\ref{fig:AreaAgg_CaseStudy2_Rg358}c.
-In an earlier version of this chapter \parencite{Peng2017AStar},
+In an earlier version of this paper \parencite{Peng2017AStar},
 we tried a combination of minimizing type changes 
 and maximizing the sum of the smallest compactness values, 
 over the whole sequence.
@@ -3022,7 +3168,7 @@ if their common boundary is too short.
 
 \section{Concluding Remarks}
 \label{sec:AreaAgg_Conclusions}
-In this chapter, we investigated the problem of 
+In this paper, we investigated the problem of 
 finding optimal sequences for area aggregation.
 We compared three methods to solve this problem, namely, 
 a greedy algorithm, \Astar, and an ILP-based algorithm.

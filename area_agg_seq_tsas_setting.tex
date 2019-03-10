@@ -74,7 +74,7 @@
 %https://tex.stackexchange.com/questions/37076/is-it-possible-to-load-biblatex-with-a-class-that-has-already-loaded-natbib
 \let\citename\relax
 \RequirePackage[
-backend=bibtex,
+backend=biber,
 style=numeric-comp, %number the references, compact
 %style=authoryear, %no indices before names; year after names
 %style=alphabetic, %style for my thesis
@@ -167,7 +167,6 @@ abbreviate=true, dateabbrev=true,
 
 \usepackage[font=small,labelfont=bf]{caption}
 \usepackage{subcaption}
-\usepackage{setspace}
 \usepackage{bm} %Bold italic vectors
 \usepackage{gensymb}  % for degree sign, e.g., temperature
 \usepackage{amsmath}  %align equations; text inside math
@@ -197,7 +196,7 @@ abbreviate=true, dateabbrev=true,
 %\usepackage{floatrow}
 %\let\newinsert\tmp
 
-\usepackage{hyperref}
+
 \usepackage{tikz}
 \usepackage{pgfplots}
 \usepackage{xspace}
@@ -235,7 +234,8 @@ abbreviate=true, dateabbrev=true,
 %\DeclareFieldFormat[article,inbook,incollection,inproceedings,
 %patent,thesis,unpublished]{title}{#1}
 %last name first in bibliography
-\DeclareNameAlias{author}{last-first}
+
+\DeclareNameAlias{author}{family-given}%lastname before firstname
 %%\fi
 
 
@@ -252,7 +252,13 @@ abbreviate=true, dateabbrev=true,
 	xlabel near ticks,
 	ylabel near ticks
 }
+
 \newcommand{\Astar}{A$^{\!\star}$\xspace}
+\newcommand{\AstarTwo}{A$^{\!\star}_{\,200{,}000}$\xspace}
+\newcommand{\AstarFour}{A$^{\!\star}_{\,400{,}000}$\xspace}
+\newcommand{\ILPOne}{ILP$_{100\,\mathrm{s}}$\xspace}
+\newcommand{\ILPTwo}{ILP$_{200\,\mathrm{s}}$\xspace}
+
 \newcommand{\tstar}{\ensuremath{t\xspace}}
 \newcommand{\Pistar}{\ensuremath{\Pi}} % 
 %\newcommand{\Comp}[1]{c_#1} % 
@@ -281,9 +287,22 @@ abbreviate=true, dateabbrev=true,
 \newcommand{\fos}{Formulas~}
 \newcommand{\sects}{Sections~}
 \newcommand{\tabs}{Tables~}
+\newcommand{\chaps}{Chapters~}
 \newcommand{\myquad}[1][1]{\hspace*{#1em}\ignorespaces}
-\newcommand{\eqquad}{\myquad[6]}
+\newcommand{\eqquadVariable}{\myquad[6]}
+\newcommand{\eqquadCost}{\myquad[2]}
+\newcommand{\eqquadConstraintsX}{\myquad[4]}
+\newcommand{\eqquadConstraintsYZ}{\myquad[3]}
+\newcommand{\eqquadConstraintsC}{\myquad[3]}
+\newcommand{\eqquadConstraints}{\myquad[3]}
+\newcommand{\eqquadConstraintW}{\myquad[3]}
 \newcommand{\inquad}{\qquad}
+\newcommand{\inquadC}{\myquad[1]}
+
+%because of \begin{array}
+%\newcommand{\embshift}{\hspace{0.5pt}}%for tsas 
+%\newcommand{\embshift}{\hspace{-3pt}}%for my thesis(10pt)
+\newcommand{\embshift}{\hspace{-2.7pt}}%for my thesis(10.5pt)
 
 %M or N are default tags. 
 %The boxes using the same tag will have the same length. 
@@ -334,13 +353,13 @@ abbreviate=true, dateabbrev=true,
 \newcolumntype{z}[1]
 {>{\raggedleft\arraybackslash\hspace{0pt}}m{#1}}
 
-%math-mode version of "x,y,z" column type
-\newcolumntype{X}[1]
-{>{\raggedright\arraybackslash\hspace{0pt}}m{$#1$}}
-\newcolumntype{Y}[1]
-{>{\centering\arraybackslash\hspace{0pt}}m{$#1$}}
-\newcolumntype{Z}[1]
-{>{\raggedleft\arraybackslash\hspace{0pt}}m{$#1$}}
+%%math-mode version of "x,y,z" column type
+%\newcolumntype{X}[1]
+%{>{\raggedright\arraybackslash\hspace{0pt}}m{$#1$}}
+%\newcolumntype{Y}[1]
+%{>{\centering\arraybackslash\hspace{0pt}}m{$#1$}}
+%\newcolumntype{Z}[1]
+%{>{\raggedleft\arraybackslash\hspace{0pt}}m{$#1$}}
 
 
 
@@ -349,6 +368,12 @@ abbreviate=true, dateabbrev=true,
 %\newcolumntype{x}[1]{>{\centering\arraybackslash\hspace{0pt}}p{#1}}
 
 
+%https://tex.stackexchange.com/questions/68308/how-to-add-running-title-and-author
+\usepackage{fancyhdr} %for command \lhead{}, \fancyhead
+
+%\usepackage{setspace}
+
+\usepackage{hyperref}
 
 %make package refcheck compatible with package hyperref 
 \makeatletter
