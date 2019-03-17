@@ -67,6 +67,7 @@ the smallest area is merged with one of its neighbors.
 We do not select that neighbor according to a prescribed rule 
 but compute the whole sequence of pairwise merges at once, 
 based on global optimization.
+We have proved that this problem is NP-hard.
 We formalize this optimization problem as that of 
 finding a shortest path in a (very large) graph.
 We present the \Astar algorithm and integer linear programming
@@ -161,8 +162,179 @@ Ideally, there should be no discrete change in CMG.
 However, the term is also used when 
 the discrete changes are small enough not to be noticed as,
 e.g., \textcite{Suba2016Road} state.
+We believe that digital maps will eventually 
+achieve smooth changes for zooming,
+and CMG is an effective way to realize smooth changes.
 
-CMG has received a lot of attention
+
+
+
+
+\mypar{Problem definition}
+In this paper, we deal with CMG of land-cover areas.
+The land-cover area is of significant importance on maps.
+When users zoom out, some land-cover areas become
+too tiny to be seen, which result in visual clutter.
+In order to provide users 
+with good visual experience during zooming operations,
+we propose to remove these tiny areas.
+We plan to achieve this goal by 
+aggregating them into neighboring land-cover areas.
+A \emph{land-cover map} is a planar subdivision in which 
+each area belongs to a land-cover class or \emph{type}.
+Suppose that there are two land-cover maps of different scales 
+that cover the same spatial region.
+We consider the problem of finding a sequence 
+of small incremental changes that gradually transforms 
+the larger-scale map (the \emph{start map}) to 
+the smaller-scale map (the \emph{goal map}).
+We use this sequence to generate and show land-cover maps at 
+intermediate scales (see \fig\ref{fig:AreaAgg_example}).
+In this way, we try to avoid large and discrete changes
+during zooming.
+
+\begin{figure}[tb]
+\centering
+\includegraphics{AreaAgg_example}
+\caption{The input and a possible output of an aggregation sequence 
+	for an instance of our problem}
+\label{fig:AreaAgg_example}
+\end{figure}
+
+With the same motivation, 
+a strategy of hierarchical schemes has been proposed.
+This strategy generalizes a more-detailed representation 
+to obtain a less-detailed representation 
+based on small incremental changes, 
+e.g., the Generalized Area Partitioning tree (GAP-tree).
+This tree can be constructed if only the larger-scale map is given
+\citep{vanOosterom1995Development} 
+or if both the larger-scale map and the smaller-scale map 
+are given \citep{HaunertDilo2009}.
+Typically, the next change in such a sequence 
+is determined locally, in a greedy fashion.  
+If we insist on finding a sequence that is optimal 
+according to some global measure,
+the problem becomes complicated.
+
+
+
+We assume that there exist many-to-one relationships between the 
+areas of the
+start map and the areas of the goal map.
+This assumption is based on the fact that many algorithms 
+\parencite[e.g.,][]{HaunertWolff2010AreaAgg,
+vanSmaalen2003,Oehrlein2017Aggregation}
+that aggregate land-cover areas
+result in many-to-one relationships.
+Their inputs and generalized results together
+can be used as our inputs.
+We term the areas of the goal map \emph{regions}.
+That is, every region is the union of a set of areas 
+on the start map.
+The type of a region may differ from the types of its 
+components. 
+For example, a small water area together with 
+multiple adjacent forest areas may constitute 
+a large forest region on the smaller-scale map.
+However, we assume that every region, on the goal map, 
+contains at least one area of the same type on the start map.
+Our assumptions hold if the goal map has been produced 
+with an automatic method for area aggregation, 
+for example, by the method of \citet{HaunertWolff2010AreaAgg}.
+That method produces a land-cover map at a single smaller scale, 
+given a land-cover map at a larger scale.
+Although \textcite{HaunertWolff2010AreaAgg}
+attain results of high quality, 
+they do not produce land-cover maps at intermediate scales.
+
+In this paper, we try to find an optimal sequence
+to aggregate the land-cover areas on the start map
+one by one until we arrive the goal map.
+We first independently deal with each region of the goal map 
+(with its components on the start map).
+Once we have found an aggregation sequence for each region, 
+we integrate all the sequences into an overall sequence,
+which transforms the start map into the goal map. 
+Our aggregation sequence may be cooperated with
+the GAP-face tree \citep{vanOosterom2005},
+the map cube model \citep{Timpf1998},
+or ScaleMaster \citep{Brewer2007Guidelines,Touya2013ScaleMaster}, 
+to support on-the-fly visualization.
+Smoothly (dis-)appearing areas can be realized
+by integrating our results into the \emph{space-scale cube}
+\parencite{vanOosterom2014tGAP,vanOosterom2014tGAPSSC}.
+
+
+\mypar{Contribution}
+We formally define our problem, 
+introduce the basic concepts of our method, 
+and analyze the size of our model in a worst-case scenario
+(\sect\ref{sec:AreaAgg_Preliminaries}).
+We define our cost functions in 
+\sect\ref{sec:AreaAgg_CostFunctions}.
+We prove that our problem is NP-hard
+(\sect\ref{sec:AreaAgg_NP-hardness}).
+Then, we develop and compare three methods 
+for finding aggregation sequences.
+First, we present 
+a greedy algorithm (\sect\ref{sec:AreaAgg_Greedy}).
+Second, we develop a new global optimization approach
+based on the \Astar algorithm 
+(\sect\ref{sec:AreaAgg_AStar}).
+Third, we model our pathfinding problem as
+an \emph{integer linear program} (ILP), 
+and then we solve this program with minimizing our cost function.
+Our ILP uses binary (0--1) variables. 
+These variables help us to model our problem, 
+but in general, it is NP-hard 
+to solve an ILP optimally.
+By comparing with the greedy algorithm, 
+which is used as a benchmark,
+we are able to see whether it is worth 
+to use \Astar or the ILP-based algorithm, 
+which are more complex and slower.  
+Our case study 
+uses a dataset of the German topographic database ATKIS 
+(\sect\ref{sec:AreaAgg_CaseStudy}).
+In the conclusions, we show possible ways to improve our 
+methods in \sect\ref{sec:AreaAgg_Conclusions}. 
+
+We do not deal with simplifying polylines in this paper.
+The simplification can be handled separately from the
+aggregation of areas, for example, 
+by using one method of 
+\textcite{Douglas1973},
+\textcite{Saalfeld1999},
+or \textcite{Wu2004DP}.
+Those methods can be used to set up 
+the binary line generalisation tree (BLG-tree) of
+\textcite{vanOosterom1995Development},
+which is a hierarchical data structure that 
+defines a gradual line simplification process.
+%
+Although splitting polygons is a good step
+of generalizing land-cover areas,
+we do not integrate it into our method at this moment.
+Some examples of splitting are as follows.
+\textcite{Smith2007MasterMap,Thiemann2018LandCover} 
+proposed to split tiny polygons 
+and then to merge the split parts into the neighboring polygons.
+\textcite{Meijers2016Split} developed an algorithm 
+to split a polygon (the splittee) 
+based on a constrained Delaunay triangulation.
+During splitting, their algorithm is capable of
+taking into account
+the attractivenesses between the splittee and its neighbors.
+When merging, a more attractive neighbor 
+will get a larger portion from the splittee.
+
+\section{Related Work}
+
+\subsection{Continuous map generalization}
+
+\emph{Continuous map generalization} (CMG)
+has received a lot of attention
 from cartographers and computer scientists.
 \Textcite{vanKreveld2001} proposed five gradual changes
 to support the continuous zooming of maps, 
@@ -245,7 +417,8 @@ as well as how much these rivers should be simplified.
 
 
 
-\mypar{Optimization in map generalization}
+\subsection{Optimization in map generalization}
+
 Map generalization generally specifies 
 and takes into account requirements
 in order to produce maps of high quality
@@ -298,13 +471,7 @@ by comparing its results with optimal solutions
 on small instances.
 
 
-\begin{figure}[tb]
-\centering
-\includegraphics{AreaAgg_example}
-\caption{The input and a possible output 
-	for an instance of 	our problem}
-\label{fig:AreaAgg_example}
-\end{figure}
+
 
 Optimization has been widely used in map generalization.
 For example, \textcite{Harrie1999} displaced objects 
@@ -361,7 +528,8 @@ stays in the same face as before the generalization.
 
 
 
-\mypar{Optimization in \emph{continuous} map generalization}
+\subsection{Optimization in \emph{continuous} map generalization}
+
 Optimization becomes more delicate
 when we deal with CMG.
 In this field, we have requirements 
@@ -396,157 +564,6 @@ over all the road networks of all the steps.
 based on LSA for morphing between polylines, 
 where LSA is used to mediate between the requirements 
 for angles and edge lengths of the intermediate polylines.
-
-
-
-\mypar{Problem definition}
-The land-cover area is of significant importance on maps.
-When users zoom out, some land-cover areas become
-too tiny to be seen, which result in visual clutter.
-In order to provide users 
-with good visual experience during zooming operations,
-we propose to remove these tiny areas.
-We plan to achieve this goal by 
-aggregating them into neighboring land-cover areas.
-A \emph{land-cover map} is a planar subdivision in which 
-each area belongs to a land-cover class or \emph{type}.
-Suppose that there are two land-cover maps of different scales 
-that cover the same spatial region.
-We consider the problem of finding a sequence 
-of small incremental changes that gradually transforms 
-the larger-scale map (the \emph{start map}) to 
-the smaller-scale map (the \emph{goal map}).
-We use this sequence to generate and show land-cover maps at 
-intermediate scales (see \fig\ref{fig:AreaAgg_example}).
-In this way, we try to avoid large and discrete changes
-during zooming.
-
-With the same motivation, 
-a strategy of hierarchical schemes has been proposed.
-This strategy generalizes a more-detailed representation 
-to obtain a less-detailed representation 
-based on small incremental changes, 
-e.g., the Generalized Area Partitioning tree (GAP-tree).
-This tree can be constructed if only the larger-scale map is given
-\citep{vanOosterom1995Development} 
-or if both the larger-scale map and the smaller-scale map 
-are given \citep{HaunertDilo2009}.
-Typically, the next change in such a sequence 
-is determined locally, in a greedy fashion.  
-If we insist on finding a sequence that is optimal 
-according to some global measure,
-the problem becomes complicated.
-
-
-We assume that there exist many-to-one relationships between the 
-areas of the
-start map and the areas of the goal map.
-This assumption is based on the fact that many algorithms 
-\parencite[e.g.,][]{HaunertWolff2010AreaAgg,
-vanSmaalen2003,Oehrlein2017Aggregation}
-that aggregate land-cover areas
-result in many-to-one relationships.
-Their inputs and generalized results together
-can be used as our inputs.
-We term the areas of the goal map \emph{regions}.
-That is, every region is the union of a set of areas 
-on the start map.
-The type of a region may differ from the types of its 
-components. 
-For example, a small water area together with 
-multiple adjacent forest areas may constitute 
-a large forest region on the smaller-scale map.
-However, we assume that every region, on the goal map, 
-contains at least one area of the same type on the start map.
-Our assumptions hold if the goal map has been produced 
-with an automatic method for area aggregation, 
-for example, by the method of \citet{HaunertWolff2010AreaAgg}.
-That method produces a land-cover map at a single smaller scale, 
-given a land-cover map at a larger scale.
-Although \textcite{HaunertWolff2010AreaAgg}
-attain results of high quality, 
-they do not produce land-cover maps at intermediate scales.
-
-In this paper, we try to find an optimal sequence
-to aggregate the land-cover areas on the start map
-one by one until we arrive the goal map.
-We first independently deal with each region of the goal map 
-(with its components on the start map).
-Once we have found an aggregation sequence for each region, 
-we integrate all the sequences into an overall sequence,
-which transforms the start map into the goal map. 
-Our aggregation sequence may be cooperated with
-the GAP-face tree \citep{vanOosterom2005},
-the map cube model \citep{Timpf1998},
-or ScaleMaster \citep{Brewer2007Guidelines,Touya2013ScaleMaster}, 
-to support on-the-fly visualization.
-Smoothly (dis-)appearing areas can be realized
-by integrating our results into the \emph{space-scale cube}
-\parencite{vanOosterom2014tGAP,vanOosterom2014tGAPSSC}.
-
-
-\mypar{Contribution}
-We formally define our problem, 
-introduce the basic concepts of our method, 
-and analyze the size of our model in a worst-case scenario
-(\sect\ref{sec:AreaAgg_Preliminaries}).
-We prove that our problem is NP-hard
-(\sect\ref{sec:AreaAgg_NP-hardness}).
-We define our cost functions in 
-\sect\ref{sec:AreaAgg_CostFunctions}.
-Then, we compare three methods for finding aggregation sequences.
-First, we develop 
-a greedy algorithm (\sect\ref{sec:AreaAgg_Greedy}).
-Second, we present a new global optimization approach
-based on the \Astar algorithm 
-(\sect\ref{sec:AreaAgg_AStar}).
-Third, we model our pathfinding problem as
-an \emph{integer linear program} (ILP), 
-and then we solve this program with minimizing our cost function.
-Our ILP uses binary (0--1) variables. 
-These variables help us to model our problem, 
-but in general, it is NP-hard 
-to solve an ILP optimally.
-By comparing with the greedy algorithm, 
-which is used as a benchmark,
-we are able to see whether it is worth 
-to use \Astar or the ILP-based algorithm, 
-which are more complex and slower.  
-Our case study 
-uses a dataset of the German topographic database ATKIS 
-(\sect\ref{sec:AreaAgg_CaseStudy}).
-In the conclusions, we show possible ways to improve our 
-methods in \sect\ref{sec:AreaAgg_Conclusions}. 
-
-We do not deal with simplifying polylines in this paper.
-The simplification can be handled separately from the
-aggregation of areas, for example, 
-by using one method of 
-\textcite{Douglas1973},
-\textcite{Saalfeld1999},
-or \textcite{Wu2004DP}.
-Those methods can be used to set up 
-the binary line generalisation tree (BLG-tree) of
-\textcite{vanOosterom1995Development},
-which is a hierarchical data structure that 
-defines a gradual line simplification process.
-%
-Although splitting polygons is a good step
-of generalizing land-cover areas,
-we do not integrate it into our method at this moment.
-Some examples of splitting are as follows.
-\textcite{Smith2007MasterMap,Thiemann2018LandCover} 
-proposed to split tiny polygons 
-and then to merge the split parts into the neighboring polygons.
-\textcite{Meijers2016Split} developed an algorithm 
-to split a polygon (the splittee) 
-based on a constrained Delaunay triangulation.
-During splitting, their algorithm is capable of
-taking into account
-the attractivenesses between the splittee and its neighbors.
-When merging, a more attractive neighbor 
-will get a larger portion from the splittee.
-
 
 
 \section{Preliminaries}
@@ -586,7 +603,8 @@ that transforms the start map into the goal map,
 we require that 
 every change involves only two areas of the current map.
 More precisely, in each step the smallest area~$u$ is merged 
-with one of its neighbors (adjacent areas)~$v$
+with one of its neighbors~$v$ 
+($v$ does not have to be the smallest neighbor)
 such that~$u$ and~$v$ are replaced by their union.
 The type of the union is restricted to be 
 the type of either~$u$ or~$v$.
@@ -722,137 +740,7 @@ For this, the number of choices is~$
 That is to say, the size of our model
 has an exponential lower bound.
 
-\section{NP-hardness Proof}
-\label{sec:AreaAgg_NP-hardness}
 
-Although we have shown that the graph of subdivisions
-has an exponential size,
-one may develop a clever algorithm 
-to find an optimal sequence efficiently.
-In the following, we prove that 
-finding such a sequence is indeed NP-hard.
-In the proof, we neglect the cost of compactness or the cost of length.
-Considering one of the two costs 
-will make the finding even more difficult.
-
-
-\newtheorem{thm}{Theorem}
-\begin{thm}
-\textsc{AreaAggregationSequence} is NP-hard 
-even if we only consider the cost of type change.
-\end{thm}
-
-\begin{proof}
-Our NP-hardness proof is by reduction from 
-the NP-complete problem \textsc{PlanarVertexCover}, 
-which is to decide, for a given 
-planar graph~$G_\mathrm{A} = (V_\mathrm{A},E_\mathrm{A})$, 
-whether there exists a vertex cover 
-with at most a given number~$k_\mathrm{A}$ of vertices. 
-For an instance of \textsc{PlanarVertexCover}
-(\fig\ref{fig:AreaAgg_Reduction}a), 
-we define a corresponding instance of \textsc{AreaAggregationSequence}
-whose start map consists of red, black, and white areas and 
-whose goal map consists of only one large red patch.
-The adjacency graphs of the two maps are illustrated 
-in \figs\ref{fig:AreaAgg_Reduction}b and~\ref{fig:AreaAgg_Reduction}c, 
-where the colors of the vertices represent 
-the colors of the corresponding areas.
-More precisely, for each vertex of~$G_\mathrm{A}$
-in \fig\ref{fig:AreaAgg_Reduction}a, 
-we define a red vertex and a black vertex, 
-which we connect with an edge. 
-For each edge of~$G_\mathrm{A}$, 
-we define two white vertices and 
-connect them with the two black vertices
-(\fig\ref{fig:AreaAgg_Reduction}b).
-
-\begin{figure}[h]
-\centering
-\includegraphics[page=1]{AreaAgg_NPHard}
-\caption{The reduction for our NP-hardness proof.
-    The dashed polygon in (c) shows 
-    that the vertices are merged.}
-\label{fig:AreaAgg_Reduction}
-\end{figure}
-
-We define the weights of the vertices 
-in \fig\ref{fig:AreaAgg_Reduction}b as follows:
-\begin{itemize}
-\item Every white vertex has weight~$1$.
-\item Every black vertex has weight~$2$.
-\item Every red vertex has weight~$2|V_\mathrm{A}| + 2|E_\mathrm{A}|$,
-which is equal to the total weight of all white and black vertices.
-\end{itemize}
-Since in each aggregation step, 
-we require the smallest area to be aggregated with one of its neighbors, 
-our definition of the weights to a certain degree determines 
-the order in which the vertices are selected:
-\begin{itemize}
-\item \emph{Phase I}: In each of the first~$2|E_\mathrm{A}|$ steps, 
-a white vertex is selected and merged with one of its neighbors, 
-such that the white vertex receives the neighbor's color or vice versa.
-\item \emph{Phase II}: In each of the next~$|V_\mathrm{A}|$ steps, 
-a non-red vertex is selected and merged with one of its neighbors.
-\item \emph{Phase III}: $|V_\mathrm{A}|-1$ steps remain to reach the goal map.
-\end{itemize}
-
-To complete the reduction, 
-we need to define the costs of color changes. 
-For any color change, 
-we charge one unit of cost per unit weight.
-Due to our construction, Phases II and III can be accomplished with
-a total cost of~$2|V_\mathrm{A}|+2|E_\mathrm{A}|$, 
-no matter how Phase I is accomplished.
-This is because, after Phase I, 
-every non-red patch will be adjacent to a red patch (vertex).
-Thus, if any non-red patch becomes selected in Phase II, 
-it can aggregate with a red patch (vertex) and 
-receive the color red. 
-This implies that Phase II costs $2|V_\mathrm{A}|+2|E_\mathrm{A}|$ 
-(which is equal to the total weight of 
-all initially white and black vertices) and, 
-since after Phase II all patches are red, 
-Phase III does not cause any additional cost.  
-It is also clear that 
-there is no cheaper way to accomplish Phases II and III,
-since it is impossible to color a vertex red in Phase I.
-Consequently, since the total cost of Phases II and III is fixed, 
-it is only interesting to ask 
-at which cost Phase I can be accomplished.
-It turns out that, if $G_\mathrm{A}$ 
-has a vertex cover $C_\mathrm{A} \subseteq V_\mathrm{A}$, 
-then Phase I can be accomplished with cost $2|C_\mathrm{A}|$;
-only the black vertices corresponding to vertices in~$C_\mathrm{A}$ 
-need to change their color from black to white, and 
-each of them has weight~$2$ (see \fig\ref{fig:reduction2}).
-To summarize, if graph~$G_\mathrm{A}$ has a vertex cover~$C_\mathrm{A}$, 
-then the corresponding instance of \textsc{AreaAggregationSequence} 
-has a solution of 
-total cost~$2|C_\mathrm{A}|+2|V_\mathrm{A}|+2|E_\mathrm{A}|$.
-
-It remains to be shown that, 
-if $C_\mathrm{A}^*$ is a minimum vertex cover of $G_\mathrm{A}$, 
-then there is no solution with total cost 
-less than $2|C_\mathrm{A}^*|+2|V_\mathrm{A}|+2|E_\mathrm{A}|$.
-To see why, we assume that such a solution exists.
-If we keep the black color of a vertex from $C_\mathrm{A}^*$ 
-(the total cost decreases by $2$),
-then we will need to at least change two white vertices
-to black vertices
-(the total cost increases by $2$ at least).
-Therefore, we have found a contradiction to our assumption.
-
-\begin{figure}[h]
-\centering
-\includegraphics[page=2]{AreaAgg_NPHard}
-\caption{The situation after Phase I has been conducted 
-    such that all black vertices corresponding to a vertex cover 
-    of~$G_\mathrm{A}$ have been recolored white.
-    The dashed polygons show that the vertices are merged.}
-\label{fig:reduction2}
-\end{figure}
-\end{proof}
 
 \section{Cost Functions}
 \label{sec:AreaAgg_CostFunctions}
@@ -905,6 +793,9 @@ which are as \emph{compact} as possible.
 Our argument is that an area is easier 
 to be identified by a human being 
 if it is more compact (less clutter).
+In this paper, we ignore the fact that
+some features may inherently take linear forms
+(e.g., rivers).
 %
 We also consider the total \emph{length} 
 of the interior boundaries as an alternative compactness;
@@ -1016,10 +907,10 @@ g_\mathrm{type}(\Pistar)=
 
 We use the compactness definition of \citet{Frolov1975}, 
 i.e., the compactness value for a patch, say,~$u$ is
-\begin{equation*}
+\begin{equation}
 \label{eq:comp}
 c(u)=\frac{2 \sqrt{\pi A_u}}{l_u},
-\end{equation*}
+\end{equation}
 where~$A_u$ and~$l_u$ are 
 the area and the perimeter. 
 For a subdivision \Psnode, we denote by~$C(\Psnode)$ 
@@ -1095,9 +986,15 @@ g_\mathrm{lgth}(\Pistar)=
 
 \subsection{Combining cost functions}
 \label{sec:AreaAgg_Combining}
-In order to minimize the type change 
-and maximize the compactness,
-we combine the two cost functions as
+
+When we generate a sequence of intermediate-scale maps,
+we want to change the types of the land-cover areas 
+as little as possible
+and want to have compact land-cover areas.
+Therefore, we combine 
+the cost of type change (\eq\ref{eq:g_type})
+and the cost of compactness (\eq\ref{eq:g_comp}).
+That is,
 \begin{equation}
 \label{eq:g_1}
 g_1(\Pistar)= (1-\lambda)g_\mathrm{type}(\Pistar)
@@ -1116,17 +1013,154 @@ Using $g_1(\Pnode)$, we compare a greedy algorithm and \Astar
 in finding optimal sequences for area aggregation.
 
 As said before, we want to make a comparison involving
-integer linear programming.
-Therefore, we also introduce a combination
-that can be computed linearly. That is,
+integer linear programming 
+while our cost of compactness (see \eq\ref{eq:comp})
+cannot be computed linearly in an integer linear program.
+Therefore, we combine 
+the cost of type change (\eq\ref{eq:g_type})
+and the cost of length (\eq\ref{eq:g_length}),
+which can be computed linearly in an integer linear program. 
+That is,
 \begin{equation}
 \label{eq:g_2}
 g_2(\Pistar)= (1-\lambda)g_\mathrm{type}(\Pistar)
 +\lambda g_\mathrm{lgth}(\Pistar).
 \end{equation}
 We compare the greedy algorithm, \Astar, and an ILP-based 
-algorithm using $g_2$.
+algorithm using~$g_2$.
 
+\section{NP-hardness Proof}
+\label{sec:AreaAgg_NP-hardness}
+
+Although we have shown that the graph of subdivisions
+has an exponential size
+(see \sect\ref{sec:AreaAgg_Preliminaries}),
+one may develop a clever algorithm 
+to find an optimal sequence efficiently.
+In the following, we prove that 
+finding such a sequence is indeed NP-hard.
+In the proof, we neglect the cost of compactness or the cost of length.
+Considering one of the two costs 
+will make the finding even more difficult.
+
+
+\newtheorem{thm}{Theorem}
+\begin{thm}
+\textsc{AreaAggregationSequence} is NP-hard 
+even if we only consider the cost of type change.
+\end{thm}
+
+\begin{proof}
+Our NP-hardness proof is by reduction from 
+the NP-complete problem \textsc{PlanarVertexCover}, 
+which is to decide, for a given 
+planar graph~$G_\mathrm{A} = (V_\mathrm{A},E_\mathrm{A})$, 
+whether there exists a vertex cover 
+with at most a given number~$k_\mathrm{A}$ of vertices. 
+For an instance of \textsc{PlanarVertexCover}
+(\fig\ref{fig:AreaAgg_Reduction}a), 
+we define a corresponding instance of \textsc{AreaAggregationSequence}
+whose start map consists of gray, black, and white areas and 
+whose goal map consists of only one large gray patch.
+The adjacency graphs of the two maps are illustrated 
+in \figs\ref{fig:AreaAgg_Reduction}b and~\ref{fig:AreaAgg_Reduction}c, 
+where the colors of the vertices represent 
+the colors of the corresponding areas.
+More precisely, for each vertex of~$G_\mathrm{A}$
+in \fig\ref{fig:AreaAgg_Reduction}a, 
+we define a gray vertex and a black vertex, 
+which we connect with an edge. 
+For each edge of~$G_\mathrm{A}$, 
+we define two white vertices and 
+connect them with the two black vertices
+(\fig\ref{fig:AreaAgg_Reduction}b).
+
+\begin{figure}[h]
+\centering
+\includegraphics[page=1]{AreaAgg_NPHard}
+\caption{The reduction for our NP-hardness proof.
+    The dashed polygon in (c) shows 
+    that the vertices are merged.}
+\label{fig:AreaAgg_Reduction}
+\end{figure}
+
+We define the weights of the vertices 
+in \fig\ref{fig:AreaAgg_Reduction}b as follows:
+\begin{itemize}
+\item Every white vertex has weight~$1$.
+\item Every black vertex has weight~$2$.
+\item Every gray vertex has weight~$2|V_\mathrm{A}| + 2|E_\mathrm{A}|$,
+which is equal to the total weight of all white and black vertices.
+\end{itemize}
+Since in each aggregation step, 
+we require the smallest area to be aggregated with one of its neighbors, 
+our definition of the weights to a certain degree determines 
+the order in which the vertices are selected:
+\begin{itemize}
+\item \emph{Phase I}: In each of the first~$2|E_\mathrm{A}|$ steps, 
+a white vertex is selected and merged with one of its neighbors, 
+such that the white vertex receives the neighbor's color or vice versa.
+\item \emph{Phase II}: In each of the next~$|V_\mathrm{A}|$ steps, 
+a non-gray vertex is selected and merged with one of its neighbors.
+\item \emph{Phase III}: $|V_\mathrm{A}|-1$ steps remain to reach the goal map.
+\end{itemize}
+
+To complete the reduction, 
+we need to define the costs of color changes. 
+For any color change, 
+we charge one unit of cost per unit weight.
+Due to our construction, Phases II and III can be accomplished with
+a total cost of~$2|V_\mathrm{A}|+2|E_\mathrm{A}|$, 
+no matter how Phase I is accomplished.
+This is because, after Phase I, 
+every non-gray patch will be adjacent to a gray patch (vertex).
+Thus, if any non-gray patch becomes selected in Phase II, 
+it can aggregate with a gray patch (vertex) and 
+receive the color gray. 
+This implies that Phase II costs $2|V_\mathrm{A}|+2|E_\mathrm{A}|$ 
+(which is equal to the total weight of 
+all initially white and black vertices) and, 
+since after Phase II all patches are gray, 
+Phase III does not cause any additional cost.  
+It is also clear that 
+there is no cheaper way to accomplish Phases II and III,
+since it is impossible to color a vertex gray in Phase I.
+Consequently, since the total cost of Phases II and III is fixed, 
+it is only interesting to ask 
+at which cost Phase I can be accomplished.
+It turns out that, if $G_\mathrm{A}$ 
+has a vertex cover $C_\mathrm{A} \subseteq V_\mathrm{A}$, 
+then Phase I can be accomplished with cost $2|C_\mathrm{A}|$;
+only the black vertices corresponding to vertices in~$C_\mathrm{A}$ 
+need to change their color from black to white, and 
+each of them has weight~$2$ (see \fig\ref{fig:reduction2}).
+To summarize, if graph~$G_\mathrm{A}$ has a vertex cover~$C_\mathrm{A}$, 
+then the corresponding instance of \textsc{AreaAggregationSequence} 
+has a solution of 
+total cost~$2|C_\mathrm{A}|+2|V_\mathrm{A}|+2|E_\mathrm{A}|$.
+
+It remains to be shown that, 
+if $C_\mathrm{A}^*$ is a minimum vertex cover of $G_\mathrm{A}$, 
+then there is no solution with total cost 
+less than $2|C_\mathrm{A}^*|+2|V_\mathrm{A}|+2|E_\mathrm{A}|$.
+To see why, we assume that such a solution exists.
+If we keep the black color of a vertex from $C_\mathrm{A}^*$ 
+(the total cost decreases by $2$),
+then we will need to at least change two white vertices
+to black vertices
+(the total cost increases by $2$ at least).
+Therefore, we have found a contradiction to our assumption.
+
+\begin{figure}[h]
+\centering
+\includegraphics[page=2]{AreaAgg_NPHard}
+\caption{The situation after Phase I has been conducted 
+    such that all black vertices corresponding to a vertex cover 
+    of~$G_\mathrm{A}$ have been recolored white.
+    The dashed polygons show that the vertices are merged.}
+\label{fig:reduction2}
+\end{figure}
+\end{proof}
 
 \section{A Greedy Algorithm}
 \label{sec:AreaAgg_Greedy}
@@ -1697,7 +1731,9 @@ than using other integers.
 \centering
 \includegraphics[page=4]{AreaAgg_ILP}
 \caption{Examples of linear programming (a)
-	and integer linear programming (b). 
+	and integer linear programming (b).
+    In (a), any point in the gray area is a feasible solution;
+    in (b), only the gray points are feasible solutions.
 }
 \label{fig:AreaAgg_ILPIllustration}
 \end{figure*}
@@ -2902,7 +2938,7 @@ is shown in \fig\ref{fig:AreaAgg_CaseStudy1_Rg53}.
 \includegraphics[page=3]{AreaAgg_CaseStudy1}
 \caption{An optimal sequence of intermediate subdivisions 
 	of region~$53$ obtained by \Astar 
-	using costs of type change and compactness.		 
+	using the costs of type change and compactness.		 
 	The numbers indicate the numbers of patches.		
 }
 \label{fig:AreaAgg_CaseStudy1_Rg53}
@@ -3125,8 +3161,7 @@ when using the two time limits, i.e., $100\,$s and~$200\,$s.
 Among all the instances that were solved to optimality by \Astar
 in both experiments (i.e., \sects\ref{sec:AreaAgg_CaseStudy1} 
 and~\ref{sec:AreaAgg_CaseStudy2}),
-region~$358$
-(marked in \tab\ref{tab:CostsInDetail})
+region~$358$ (marked in \tab\ref{tab:CostsInDetail})
 is the largest one.
 In both experiments, the cost of type change is~$0.044$.
 The optimal aggregation sequences for this region
@@ -3159,6 +3194,12 @@ if their common boundary is too short.
 \caption{Some intermediate subdivisions of region~$358$ 
 	obtained by \Astar with different cost functions.
 	The numbers indicate the numbers of patches.
+    The step from $8$ patches to $7$ patches 
+    when using cost function~$g1$ is a bad move; see figure (b). 
+    Instead, we expect the result of figure (a). 
+    Using cost function~$g2$, we had a similar problem. 
+    The subdivision with $7$ patches is such an example, 
+    where we expect the result of figure (c).
 }
 \label{fig:AreaAgg_CaseStudy2_Rg358}
 \end{figure}
