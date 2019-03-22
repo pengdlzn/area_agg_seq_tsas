@@ -27,7 +27,7 @@
 %  \postcode{43017-6221}
   \country{Germany}
 }
-\email{dongliang.peng@uni-wuerzburg.de}
+\email{www1.informatik.uni-wuerzburg.de/peng}
 
 \author{Alexander Wolff}
 \orcid{0000-0001-5872-718X}
@@ -57,7 +57,7 @@ Given two land-cover maps at two different scales,
 we want to find a sequence of small incremental
 changes that gradually transforms one map into the other.
 We assume that the two input maps consist of polygons 
-each of which belongs to a given land-cover class. 
+each of which belongs to a given land-cover type. 
 Every polygon on the smaller-scale map
 is the union of a set of adjacent polygons 
 on the larger-scale map. 
@@ -219,21 +219,23 @@ the problem becomes complicated.
 
 
 
-We assume that there exist many-to-one relationships between the 
-areas of the
-start map and the areas of the goal map.
+We assume that there exist many-to-one relationships 
+between the areas of the start map and the areas of the goal map.
 This assumption is based on the fact that many algorithms 
 \parencite[e.g.,][]{HaunertWolff2010AreaAgg,
 vanSmaalen2003,Oehrlein2017Aggregation}
-that aggregate land-cover areas
-result in many-to-one relationships.
+result in many-to-one relationships
+when aggregating land-cover areas.
 Their inputs and generalized results together
 can be used as our inputs.
+However, we should not use those algorithms
+to generate a sequence of maps at different scales, 
+because those algorithms do not take into account 
+the consistence of the generated maps.
 We term the areas of the goal map \emph{regions}.
 That is, every region is the union of a set of areas 
 on the start map.
-The type of a region may differ from the types of its 
-components. 
+The type of a region may differ from the types of its components. 
 For example, a small water area together with 
 multiple adjacent forest areas may constitute 
 a large forest region on the smaller-scale map.
@@ -246,7 +248,7 @@ That method produces a land-cover map at a single smaller scale,
 given a land-cover map at a larger scale.
 Although \textcite{HaunertWolff2010AreaAgg}
 attain results of high quality, 
-they do not produce land-cover maps at intermediate scales.
+they do not produce a sequence land-cover maps.
 
 In this paper, we try to find an optimal sequence
 to aggregate the land-cover areas on the start map
@@ -255,7 +257,8 @@ We first independently deal with each region of the goal map
 (with its components on the start map).
 Once we have found an aggregation sequence for each region, 
 we integrate all the sequences into an overall sequence,
-which transforms the start map into the goal map. 
+which transforms the start map into the goal map
+(see \fig\ref{fig:AreaAgg_IntegrateSequence}). 
 Our aggregation sequence may be cooperated with
 the GAP-face tree \citep{vanOosterom2005},
 the map cube model \citep{Timpf1998},
@@ -265,14 +268,28 @@ Smoothly (dis-)appearing areas can be realized
 by integrating our results into the \emph{space-scale cube}
 \parencite{vanOosterom2014tGAP,vanOosterom2014tGAPSSC}.
 
+\begin{figure*}[tb]
+\centering
+\includegraphics[page=2]{AreaAgg_Preliminaries}
+\caption{Integrating two aggregation sequences 
+	of different regions: 
+	the resulting sequence contains the given sequences 
+	as subsequences and 
+	always takes the subdivision with smallest patch next.
+	The gray arrows show the integration of the two regions.
+}
+\label{fig:AreaAgg_IntegrateSequence}
+\end{figure*}
 
 \mypar{Contribution}
-We formally define our problem, 
-introduce the basic concepts of our method, 
-and analyze the size of our model in a worst-case scenario
+We show related work (\sect\ref{sec:AreaAgg_RelatedWork}).
+Then, we formally model our problem, 
+analyze the size of our model in a worst-case scenario,
+introduce our methods,
+and present the basic concepts of our method
 (\sect\ref{sec:AreaAgg_Preliminaries}).
-We define our cost functions in 
-\sect\ref{sec:AreaAgg_CostFunctions}.
+We define our cost functions 
+(\sect\ref{sec:AreaAgg_CostFunctions}).
 We prove that our problem is NP-hard
 (\sect\ref{sec:AreaAgg_NP-hardness}).
 Then, we develop and compare three methods 
@@ -284,7 +301,8 @@ based on the \Astar algorithm
 (\sect\ref{sec:AreaAgg_AStar}).
 Third, we model our pathfinding problem as
 an \emph{integer linear program} (ILP), 
-and then we solve this program with minimizing our cost function.
+and we solve this ILP with minimizing our cost function
+(\sect\ref{sec:AreaAgg_ILP}).
 Our ILP uses binary (0--1) variables. 
 These variables help us to model our problem, 
 but in general, it is NP-hard 
@@ -298,7 +316,7 @@ Our case study
 uses a dataset of the German topographic database ATKIS 
 (\sect\ref{sec:AreaAgg_CaseStudy}).
 In the conclusions, we show possible ways to improve our 
-methods in \sect\ref{sec:AreaAgg_Conclusions}. 
+methods (\sect\ref{sec:AreaAgg_Conclusions}). 
 
 We do not deal with simplifying polylines in this paper.
 The simplification can be handled separately from the
@@ -330,6 +348,7 @@ When merging, a more attractive neighbor
 will get a larger portion from the splittee.
 
 \section{Related Work}
+\label{sec:AreaAgg_RelatedWork}
 
 \subsection{Continuous map generalization}
 
@@ -584,18 +603,7 @@ This region consists of~$n$ land-cover
 areas (components) on the start map. 
 In other words, the union of the~$n$ land-cover areas 
 is the only region on the goal map.
-\begin{figure*}[tb]
-\centering
-\includegraphics[page=2]{AreaAgg_Preliminaries}
-\caption{Integrating two aggregation sequences 
-	of different regions: 
-	the resulting sequence contains the given sequences 
-	as subsequences and 
-	always takes the subdivision with smallest patch next.
-	The gray arrows show the integration of the two regions.
-}
-\label{fig:AreaAgg_IntegrateSequence}
-\end{figure*}
+
 
 
 To find a sequence of small changes 
@@ -635,8 +643,8 @@ We consider a directed graph $G_\mathrm{S}$,
 which we call the \emph{subdivision graph} 
 (see \fig\ref{fig:AreaAgg_SubdivisionName}). 
 The node set $V_\mathrm{S}$ of~$G_\mathrm{S}$ 
-contains a node for every
-possible map (or \emph{subdivision}), including the start map, 
+contains nodes for all the
+possible maps (or \emph{subdivisions}), including the start map, 
 all possible intermediate-scale maps, and the goal map.
 The arc set~$E_\mathrm{S}$ of~$G_\mathrm{S}$ 
 contains an arc $(\Pnode, P_{t+1,j})$ 
@@ -644,22 +652,9 @@ between any two maps~$\Pnode$ and~$P_{t+1,j}$ in~$V_\mathrm{S}$
 if~$P_{t+1,j}$ can be reached from~$\Pnode$ 
 with a single aggregation operation,
 involving a smallest area.
-Then, any directed path in~$G_\mathrm{S}$ 
+On this basis, any directed path in~$G_\mathrm{S}$ 
 from the start map to the goal map
 defines a possible aggregation sequence.
-Our idea is to obtain an optimal aggregation sequence through 
-computing a minimum-weight path from the start to the goal.
-This idea obviously requires that the arc weights are 
-set such that a minimum-weight start--goal
-path does actually correspond to an aggregation sequence of 
-maximum cartographic quality.  
-Moreover, putting the idea to practice is far from trivial 
-since graph~$G_\mathrm{S}$ can be huge as we will argue later.
-We compare a greedy algorithm, \Astar, and an ILP-based algorithm
-in finding such paths.
-Note that we only know 
-subdivisions~$\Pstart$ and~$\Pgoal$ at the beginning.
-We generate a subdivision (node) only when we want to visit it.
 
 
 \begin{figure}[tb]
@@ -674,6 +669,51 @@ We generate a subdivision (node) only when we want to visit it.
 \label{fig:AreaAgg_SubdivisionName}
 \end{figure}
 
+
+\mypar{Exponential lower bound}
+We now analyze the size of subdivision graph~$G_\mathrm{S}$.
+Our analysis is inspired by \textcite{Keane1975Size},
+where we use a row of~$n$ land-cover areas.
+In our instance
+(see \fig\ref{fig:AreaAgg_ExponentialSize}), 
+the start map consists of~$n=2k+1$ rectangles,
+and the goal map is simply the union of the~$n$ rectangles.
+At layer~$L_{k+1}$, we need to remove~$k$ of the~$2k$ 
+intermediate vertical boundaries. 
+For this, the number of choices is~$
+\binom{2k}{k}
+= \frac{2k\cdot (2k-1)\cdot \ldots \cdot (k+1)}
+{k\cdot (k-1)\cdot \ldots \cdot 1}
+\ge 2^k = 2^{(n-1)/2}$.
+That is to say, the size of our model
+has exponential lower bound.
+
+
+
+\mypar{Methods}
+Our idea is to obtain an optimal aggregation sequence through 
+computing a minimum-weight path from the start to the goal 
+(see \fig\ref{fig:AreaAgg_SubdivisionName}).
+This idea obviously requires that the arc weights are 
+set such that a minimum-weight start--goal
+path does actually correspond to an aggregation sequence of 
+maximum cartographic quality.  
+Moreover, putting the idea to practice is far from trivial 
+since graph~$G_\mathrm{S}$ can be huge.
+We compare a greedy algorithm, \Astar, and an ILP-based algorithm
+in finding such paths.
+Note that our inputs are only
+subdivisions~$\Pstart$ and~$\Pgoal$.
+We generate a subdivision (node) only when we want to visit it.
+
+In directed acyclic graphs, shortest paths can be found slightly faster 
+than in general directed or undirected graphs.
+An off-the-shelf shortest-path algorithm for directed acyclic graphs,
+however, will explore the whole graph, which has exponential size.
+The challenge in our work was to tune the A* algorithm such that it
+explores only a small fraction of the graph.
+
+
 \mypar{Notation}
 We represent each land-cover area by a polygon with a type.
 We denote by $P$ the set of polygons on the start map.
@@ -681,7 +721,6 @@ We use~$p$, $q$, $r$, or~$o$ to denote polygons.
 A \emph{patch} is a set of polygons whose union is connected. 
 Each patch also has a unique land-cover area type.
 We use~$u$ or~$v$ to denote the patches.
-
 
 Recall that we are dealing with a single region and 
 there are~$n$ land-cover areas on the start map in this region. 
@@ -722,23 +761,7 @@ we call such a graph $G_\mathrm{A}$
 \label{fig:AreaAgg_Variables_Graph}
 \end{figure} 
 
-\mypar{Exponential lower bound}
-We now analyze the size of subdivision graph~$G_\mathrm{S}$.
-Our analysis is inspired by \textcite{Keane1975Size},
-where we also use a row of~$n$~areas.
-In our instance
-(see \fig\ref{fig:AreaAgg_ExponentialSize}), 
-the start map consists of~$n=2k+1$ rectangles,
-and the goal map is simply the union of the~$n$ rectangles.
-At layer~$L_{k+1}$, we need to remove~$k$ of the~$2k$ 
-intermediate vertical boundaries. 
-For this, the number of choices is~$
-\binom{2k}{k}
-= \frac{2k\cdot (2k-1)\cdot \ldots \cdot (k+1)}
-{k\cdot (k-1)\cdot \ldots \cdot 1}
-\ge 2^k = 2^{(n-1)/2}$.
-That is to say, the size of our model
-has an exponential lower bound.
+
 
 
 
@@ -1041,7 +1064,7 @@ In the following, we prove that
 finding such a sequence is indeed NP-hard.
 In the proof, we neglect the cost of compactness or the cost of length.
 Considering one of the two costs 
-will make the finding even more difficult.
+will make the computation even more difficult.
 
 
 \newtheorem{thm}{Theorem}
@@ -1070,9 +1093,10 @@ More precisely, for each vertex of~$G_\mathrm{A}$
 in \fig\ref{fig:AreaAgg_Reduction}a, 
 we define a gray vertex and a black vertex, 
 which we connect with an edge. 
-For each edge of~$G_\mathrm{A}$, 
+For each edge $\{u,v\}$ of~$G_\mathrm{A}$, 
 we define two white vertices and 
-connect them with the two black vertices
+connect each of them both with the black vertex for $u$
+and the black vertex for $v$
 (\fig\ref{fig:AreaAgg_Reduction}b).
 
 \begin{figure}[h]
@@ -1092,14 +1116,18 @@ in \fig\ref{fig:AreaAgg_Reduction}b as follows:
 \item Every gray vertex has weight~$2|V_\mathrm{A}| + 2|E_\mathrm{A}|$,
 which is equal to the total weight of all white and black vertices.
 \end{itemize}
-Since in each aggregation step, 
-we require the smallest area to be aggregated with one of its neighbors, 
-our definition of the weights to a certain degree determines 
+When we merge two vertices, 
+the weight of the new vertex is the sum of the two.
+In each aggregation step, 
+we require the smallest area to be aggregated with one of its neighbors.
+The area sizes correspond to the weights of the vertices in \fig\ref{fig:AreaAgg_Reduction}b.   
+Therefore, our definition of the weights to a certain degree determines 
 the order in which the vertices are selected:
 \begin{itemize}
 \item \emph{Phase I}: In each of the first~$2|E_\mathrm{A}|$ steps, 
 a white vertex is selected and merged with one of its neighbors, 
-such that the white vertex receives the neighbor's color or vice versa.
+such that the white vertex receives the neighbor's color or vice versa
+(\fig\ref{fig:reduction2} shows a possible result).
 \item \emph{Phase II}: In each of the next~$|V_\mathrm{A}|$ steps, 
 a non-gray vertex is selected and merged with one of its neighbors.
 \item \emph{Phase III}: $|V_\mathrm{A}|-1$ steps remain to reach the goal map.
@@ -1115,7 +1143,7 @@ no matter how Phase I is accomplished.
 This is because, after Phase I, 
 every non-gray patch will be adjacent to a gray patch (vertex).
 Thus, if any non-gray patch becomes selected in Phase II, 
-it can aggregate with a gray patch (vertex) and 
+it can be aggregated with a gray patch (vertex) and 
 receive the color gray. 
 This implies that Phase II costs $2|V_\mathrm{A}|+2|E_\mathrm{A}|$ 
 (which is equal to the total weight of 
@@ -1237,16 +1265,16 @@ we use the \Astar algorithm \parencite{Hart1968,PatelAStar}.
 To save time and memory, 
 we generate a subdivision, \Pnode, only 
 when we are going to visit it.
-\Astar uses a clever best-first search 
+The \Astar algorithm uses a clever best-first search 
 to find a shortest path 
 from subdivision~$\Pstart$ to subdivision~$\Pgoal$.  
 For \Pnode,
 \Astar considers the exact cost of a shortest path 
 from~\Pstart to~\Pnode 
 and estimates the cost to get from~\Pnode to~\Pgoal. 
-\Astar explores the nodes earlier 
+The \Astar algorithm explores the nodes earlier 
 if they are estimated to be closer to the goal.
-\Astar can be seen as a refinement of Dijkstra's algorithm
+The \Astar algorithm can be seen as a refinement of Dijkstra's algorithm
 \parencite{Dijkstra1959}.
 
 We define~$g(\Pnode)$ to be 
@@ -1456,7 +1484,7 @@ c_\mathrm{reg}(\mathcal{N})=
 \sqrt{\frac{\pi}{\mathcal{N}} \bigg/
 	\tan{\frac{\pi}{\mathcal{N}}}}.
 \end{equation*}
-Note that~$c_\mathrm{reg}(\mathcal{N})$ increases 
+Note that compactness~$c_\mathrm{reg}(\mathcal{N})$ increases 
 with increasing~$\mathcal{N}$.
 A patch with~$\mathcal{N}_{t+1,i''_{t+1}}$ edges has
 compactness~$c_\mathrm{reg} (\mathcal{N}_{t+1,i''_{t+1}})$.
@@ -1603,6 +1631,864 @@ h_2(\Pnode)=
 
 \section{Integer Linear Programming}
 \label{sec:AreaAgg_ILP}
+
+We want to compare the \Astar algorithm with 
+integer linear programming in finding 
+optimal sequences for our aggregation problem. 
+Since integer linear programming
+can handle only linear constraints, 
+we define the compactness of a subdivision as 
+the length of the subdivision's interior boundaries.
+That is, we use cost function~$g_2$ (see \eq\ref{eq:g_2}).
+Our basic idea is to formalize the problem of 
+finding a shortest path as an ILP.
+Then we solve this ILP by minimizing the total cost.
+As the \Astar algorithm performed better in our case study,
+here we skip the formulation of our ILP.
+The formulation can be found in Appendix~\ref{app:AreaAgg_ILP}.
+
+\section{Case Study}
+\label{sec:AreaAgg_CaseStudy}
+We have implemented our methods 
+based on C\# (Microsoft Visual Studio~2017) 
+and ArcObjects SDK~10.6.0.
+We used the IBM ILOG
+CPLEX Optimization Studio~12.6.3.0 to solve our ILP.
+Our prototype is open access on GitHub\footnote{%
+\url{https://github.com/IGNF/ContinuousGeneralisation},
+Accessed: Jun 18, 2018.}.
+We ran our case study
+under 64-bit Windows~10 
+on Intel(R) Core(TM) i7-6700 CPU @~$3.40\,$GHz with~$4$ cores;
+the computer has $16\,$GB RAM.
+We measured processing time 
+by the built-in C\# class \emph{Stopwatch}.
+As required by ArcObjects SDK~10.6.0,
+we specified our program to run on the~$32$-bit platform. 
+We added a post-build task about ``largeaddressaware''
+in Microsoft Visual Studio so that 
+we were able to use up to~$3\,$GB of the 
+main memory\footnote{The details of the setting can be found at \url
+{http://stackoverflow.com/questions/2597790/can-i-set-largeaddressaware-from-within-visual-studio},
+Accessed: Nov 1, 2017.}.
+Our CPLEX version may declare an optimal solution
+while it is not really optimal.
+To fix this problem, we had to disable 
+both primal and dual presolve 
+reductions\footnote{For more details about the problem, see
+\url{http://www-01.ibm.com/support/docview.wss?uid=swg1RS02094},
+Accessed: Nov 12, 2017.}.
+
+We tested our method on a dataset 
+from the German topographic database ATKIS DLM~50. 
+The dataset represents the place 
+``Buchholz in der Nordheide'' at scale~$1:50{,}000$. 
+Our start map is the result of collapsing areas 
+by \citet[\chap6]{haunert2008f}.
+The start map has~$5{,}537$ polygons. 
+Our goal map was generalized from the start map 
+by~\citet{HaunertWolff2010AreaAgg}, setting the scale 
+to~$1:250{,}000$ (see \fig\ref{fig:AreaAgg_Data}). 
+The goal map has~$734$ polygons, 
+which means that there are~$N=734$ regions.
+The distribution of region sizes is shown in 
+\fig\ref{fig:AreaAgg_NumRegion}.
+%
+We used a tree-based method introduced by 
+\citet{Rada1989SemanticMetric} 
+to define the distances of the types;
+the distance is the ``number of edges'' that
+we need to travel from one node to another node in the tree of 
+type hierarchy\footnote{More information 
+    about land-cover types can be found at 
+%	\url{http://www.atkis.de/dstinfo/dstinfo2.dst_gliederung},
+	Accessed: Nov 1, 2017.}
+(see \fig\ref{fig:AreaAgg_TypeDistances}). 
+For example, the distance from type \emph{village}
+to type \emph{fence} is~$2$, 
+to type \emph{street} is~$4$, and
+to type \emph{farm land} is~$6$.
+In this tree, the maximum distance is~$6$, 
+which means~$T_\mathrm{max}=6$ for \eq\ref{eq:f_type}.
+According to \citet{Rada1989SemanticMetric}, 
+the resulting cost function for type change is a metric.
+
+
+\begin{figure}[tb]
+%\captionsetup[subfigure]{labelformat=empty}
+\begin{subfigure}[b]{.49\textwidth}
+\centering
+\includegraphics[page=1]{AreaAgg_Data}
+\caption{Start map, $5{,}537$ polygons, \\
+	at scale $1:50{,}000$}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{.49\textwidth}
+\centering
+\includegraphics[page=2]{AreaAgg_Data}
+\caption{Goal map, $734$ polygons, \\
+	at scale $1:250{,}000$}
+\end{subfigure}
+%
+%It doesn't work to directly use 
+%\vspace{\baselineskip} for subfigures.
+\par\vspace{\baselineskip} %Leave a gap	figures
+%
+\begin{subfigure}{\textwidth}
+\centering
+\includegraphics[page=3]{AreaAgg_Data}
+\caption{The 20 land-cover types appearing in our data}
+\end{subfigure}
+\caption{The data of our case study.}
+\label{fig:AreaAgg_Data}
+\end{figure}
+
+\begin{figure}[tb]
+\centering
+\includegraphics[page=4]{AreaAgg_Data}
+\caption{Distribution of the region sizes:
+	the $y$-axis shows how many regions 
+	of a given size range are contained in our dataset.}
+\label{fig:AreaAgg_NumRegion}
+\end{figure}
+
+\begin{figure}[tb]
+\centering
+\includegraphics[page=5]{AreaAgg_Data}
+\caption{The tree of type hierarchy used in our case study.
+	For example, the distance between 
+	types \emph{village} and \emph{farm land} is~$6$.}
+\label{fig:AreaAgg_TypeDistances}
+\end{figure}
+
+\subsection{Using costs of type change and compactness}
+\label{sec:AreaAgg_CaseStudy1}
+
+As illustrated in \sect\ref{sec:AreaAgg_Combining},
+we compare \Astar and the greedy algorithm using $g_1(\Pnode)$,
+which is a combination of the costs 
+of type change and compactness (see \eq\ref{eq:g_1}).
+For \Astar, we overestimated 
+whenever we could not find a solution after 
+having visited~$W$ nodes 
+(see \sect\ref{sec:AreaAgg_AStar}).
+We tried~$W=200{,}000$ and~$W=400{,}000$
+(if we could use more main memory, 
+then we could test by using some larger~$W$). 
+The results are shown in 
+Table~\ref{tab:AreaAgg_CaseStudy1_Statistics}.
+%
+Comparing to \Astar, 
+the greedy algorithm visited 
+fewer nodes and arcs in graph~$G_\mathrm{S}$ 
+and used much less time.
+However, \Astar managed to find solutions with 
+lower total cost,~$117.3$ (or~$117.2$), 
+which is~$2.8\%$ less than 
+the total cost of the greedy algorithm,~$120.7$.
+%
+When~$W=200{,}000$, we are sure that 
+we have found optimal solutions 
+for~$702$ of the~$734$ regions ($95.6\%$),
+while the greedy algorithm solved 
+only~$408$ ($55.6\%$) to optimality;
+see column \#OS in 
+Table~\ref{tab:AreaAgg_CaseStudy1_Statistics}.
+For the other~$32$ regions, 
+both algorithms have found feasible solutions 
+(see column \#FS in 
+Table~\ref{tab:AreaAgg_CaseStudy1_Statistics}).
+Although some of the feasible solutions may also be optimal,
+we cannot verify that only from the cost values.
+
+
+\begin{table*}[tb]
+\caption{A comparison of the greedy algorithm and \Astar		
+	when using cost function~$g_1$ (see \eq\ref{eq:g_1}).
+	For \Astar, we used two settings, 
+	i.e.,~$W=200{,}000$ and~$W=400{,}000$.
+	%
+	Column~\#OS shows the numbers of regions 
+    that we obtained optimal solutions.   
+	%
+	Column~\#FS presents 
+    the numbers and the percentages of regions (out of~$N=734$) 
+    that we obtained feasible (non-optimal) solutions.
+	%
+	Variable~$k_\mathrm{sum}$ is 
+	the total number of repetitions.
+	%
+	Columns~\#nodes and~\#arcs are the total 
+	numbers of nodes and arcs that \Astar visited  
+	(for instances where we needed overestimation, 
+	only the final attempt was counted).
+	%
+	Columns~$\sum g_\mathrm{type}$, $\sum g_\mathrm{comp}$, 
+	and~$\sum g_1$
+	respectively denotes the sums of~$g_\mathrm{type}(\Pgoal)$,
+	$g_\mathrm{comp}(\Pgoal)$, and~$g_1(\Pgoal)$ 
+	over all the~$734$ instances 
+	(see \eqs\ref{eq:g_type}, \ref{eq:g_comp}, 
+	and~\ref{eq:g_1}).
+	%
+	The percentage in the \emph{Time}
+	column is the fraction of the runtime 
+    spent on solving the instances
+	that we obtained feasible solutions.
+    For \Astar, the time needed for overestimation
+    is included.
+}
+\label{tab:AreaAgg_CaseStudy1_Statistics}
+\centering
+\fontsize{9}{11}\selectfont %for my thesis; should before \setlength{\tabcolsep}{0.7ex}
+\setlength{\tabcolsep}{0.7ex}
+\begin{tabular}{lRRRCCCCCd{3.7}}
+\toprule
+\multicolumn{1}{l}{Methods} &
+\multicolumn{1}{l}{\#OS} &
+\multicolumn{1}{c}{\#FS} &
+\multicolumn{1}{r}{$k_\mathrm{sum}$} &  
+\multicolumn{1}{c}{\#nodes} & 
+\multicolumn{1}{c}{\#arcs} & 
+\multicolumn{1}{c}{$\sum g_\mathrm{type}$} & 
+\multicolumn{1}{c}{$\sum g_\mathrm{comp}$} & 
+\multicolumn{1}{c}{$\sum g_1$} & 
+\multicolumn{1}{c}{Time (min)} \\ 
+\midrule
+Greedy 	& 408 
+&326~(44.4\%) 
+&             &5.5\cdot 10^3   &4.8\cdot 10^3   
+&53.2         &188.2           &120.7           &0'1~(74.6\%)\\
+%
+%
+\AstarTwo	& 702 
+&  32~(\parbox{\widthof{$4$}}{$\,$}$4.4\%$) 
+& 102 &  3.6\cdot 10^6 &    5.7\cdot 10^6	
+& 51.4 & 183.2 & 117.3 & 51'6~(93.2\%)\\
+%
+%
+\AstarFour	& 704 
+&  30~(\parbox{\widthof{$4$}}{$\,$}$4.1\%$)
+&  89 &  6.5\cdot 10^6 &    9.8\cdot 10^6
+& 51.4 & 183.1 & 117.2 & 93'1~(95.5\%)
+\\ \bottomrule			
+\end{tabular}
+\end{table*}
+
+
+In accordance with \sect\ref{sec:AreaAgg_AStar}, 
+for region with ID~$i$ 
+we define~$k_i$ as the least number of repetitions 
+that we do to find a feasible solution. 
+We define the total number of repetitions 
+as~$k_\mathrm{sum}=\sum_{i=1}^N k_i$, 
+where~$N=734$ is the number of the regions.
+After increasing~$W$ to~$400{,}000$, 
+\Astar found optimal aggregation sequences 
+for only two more regions, 
+but $k_\mathrm{sum}$ decreased quite a bit, 
+from~$102$ to~$89$. 
+The numbers of regions that needed certain
+overestimation steps are shown in 
+\fig\ref{fig:AreaAgg_OverStats}. 
+Besides, \Astar visited more arcs and nodes, 
+used more time, 
+but got (slightly) less cost when increasing~$W$ to~$400{,}000$.
+Although the number of regions 
+that needed overestimation is relatively small, 
+\Astar spent most of the running time 
+on those few regions:~$4.4\%$ and~$4.1\%$ of the regions 
+caused~$93.2\%$ and~$95.5\%$ of the total running time, 
+respectively 
+(see Table~\ref{tab:AreaAgg_CaseStudy1_Statistics}).
+
+\begin{figure}[tb]
+\centering
+\includegraphics[page=2]{AreaAgg_CaseStudy1_Plot}
+\caption{The numbers of regions where \Astar was 
+	forced to use the given overestimation parameters
+	in order to find a solution 
+	without exploring more than 
+	$W \in \{200{,}000;~400{,}000\}$ 
+	nodes of the subdivision graph.}
+\label{fig:AreaAgg_OverStats}
+\end{figure}
+
+The details of some regions are presented in 
+Table~\ref{tab:CostsInDetail}.
+According to the entries with overestimation factor $K_i=0$, 
+we often have 
+ratios~$R_\mathrm{type}=1$ and~$R_\mathrm{comp}>1$.
+When factor~$K_i=0$, we did not overestimate for region~$i$.
+The estimated cost must be smaller or equal to the exact cost,
+which results in~$R_\mathrm{type}\ge 1$ 
+and~$R_\mathrm{comp}\ge 1$.
+Ratio~$R_\mathrm{type} = 1$ means that our estimation for the 
+cost of type change is the best.
+A larger~$R_\mathrm{comp}$ means 
+a poorer estimation for the cost of shape.
+
+\begin{table*}[tb]
+\caption{The costs in detail of some regions, 
+	where~$W=200{,}000$.  
+	Parameters~$n$ and~$m$ are the numbers of patches and 
+	adjacencies on the start map, respectively.
+	Parameter $K$ is the overestimation factor, 
+	defined in \sect\ref{sec:AreaAgg_Preliminaries}. 
+	We evaluate the quality 
+	of our estimations for type change and 
+	compactness by listing the numbers~
+	$R_\mathrm{type}=g_\mathrm{type}(\Pgoal)
+	/h_\mathrm{type}(\Pstart)$ and~
+	$R_\mathrm{comp}=g_\mathrm{comp}(\Pgoal)
+	/h_\mathrm{comp}(\Pstart)$. 
+	Note that if~$h_\mathrm{type}(\Pstart)=0$,
+    then we have~$g_\mathrm{type}(\Pgoal)=0$; 
+	in this case, we define~$R_\mathrm{type}=1$.
+	The marked entries are discussed in the text.
+}
+\label{tab:CostsInDetail}
+\centering
+\includegraphics[page=3]{AreaAgg_CaseStudy1_Plot}
+\end{table*}
+
+
+According to columns~$n$ and~$K$ of \tab\ref{tab:CostsInDetail},
+\AstarTwo managed to find optimal solutions 
+for all the regions with fewer than~$15$ polygons,
+and only found feasible solutions 
+for any region with more than~$21$ polygons.
+Among the~$702$ regions that 
+\AstarTwo solved to optimality,
+the greedy algorithm failed to 
+find optimal solutions for~$294$ regions.
+Solutions of the greedy algorithm cost
+at most~$41.7\%$ more than 
+solutions of \AstarTwo;
+for region~$85$, the greedy algorithm yields 
+a solution of cost~$0.777$, 
+while the solution of \AstarTwo has cost~$0.548$
+(see \fig\ref{fig:AreaAgg_CaseStudy1_Rg85}).
+As the patches in the two sequences are the same,
+the two results have the same cost of compactness.
+The main difference is the choice of the first step, 
+from~$8$ patches to~$7$.
+When aggregating the smallest patch on the start map
+with the surrounding patch,
+our greedy algorithm chooses the type 
+which is closer to the goal type.
+In this case, the smallest patch has type~$5112$, and the 
+surrounding one has~$2112$.
+The type of the goal patch is~$4102$.
+According to \fig\ref{fig:AreaAgg_TypeDistances},
+type distances~$d(5112,4102)=4$ and~$d(2112,4102)=6$.
+As a result, our greedy algorithm uses~$5112$ 
+as the type for the new patch. 
+This choice is a big mistake 
+because the type of the largest patch on the start map
+will have to be changed twice during the aggregation.
+These changes cause a cost more than the sequence obtained by 
+\AstarTwo, 
+where the largest patch on the start map is changed to 
+the target type directly.
+
+Among the $32$~regions that 
+\AstarTwo failed to solve optimally,
+the greedy algorithm outperformed \AstarTwo 
+for~$15$ regions ($46.9\%$).
+%
+Among these, solutions of the greedy algorithm 
+cost at most~$15.9\%$ less than solutions of \AstarTwo;
+for region~$543$, the greedy algorithm yields 
+a solution of cost~$0.112$, 
+while the solution of \AstarTwo costs~$0.134$. 
+For this instance, 
+\AstarTwo used overestimation parameter~$K=7$
+(marked in \tab\ref{tab:CostsInDetail}).
+\fig\ref{fig:AreaAgg_CaseStudy1_Rg543} shows 
+some intermediate results obtained by
+\AstarTwo and the greedy algorithm.
+Interestingly, the two methods produced the same sequence until 
+there were~$8$ patches left.
+Then due to the overestimation, 
+\AstarTwo did some bad moves
+because the bad aggregation sequence still seemed better 
+than other sequences.
+In contrast, the greedy algorithm was looking for locally good 
+aggregations.
+%
+Among the~$32$ regions that 
+\AstarTwo failed to solve optimally,  
+solutions of the greedy algorithm cost at most~$17.4\%$ 
+more than solutions of \AstarTwo; 
+for region~$155$, the greedy algorithm yields 
+a solution of cost~$0.372$, while
+the solution of \AstarTwo costs~$0.317$
+(marked in \tab\ref{tab:CostsInDetail}).
+
+Finally, an optimal aggregation sequence of region~$53$
+(third-last row in \tab\ref{tab:CostsInDetail})
+obtained by \AstarTwo
+is shown in \fig\ref{fig:AreaAgg_CaseStudy1_Rg53}.
+
+\begin{figure}[tb]
+\centering
+\includegraphics[page=1]{AreaAgg_CaseStudy1}
+\caption{Aggregation sequences of region~$85$ 
+	obtained by \Astar and the greedy algorithm.
+	In order to save space, we did not show the results 
+	when there are~$4$ or~$5$ patches, 
+	which one can easily deduce.
+	The numbers indicate the numbers of patches.
+    %
+    In the sequence obtained by \Astar, 
+    the type of the largest polygon on the start map 
+    changed only once, which is good; 
+    while the type of the largest polygon changed twice 
+    in the sequence obtained by the Greedy algorithm.}
+\label{fig:AreaAgg_CaseStudy1_Rg85}
+\end{figure}
+
+\begin{figure}[tb]
+\centering
+\includegraphics[page=2]{AreaAgg_CaseStudy1}
+\caption{Some intermediate subdivisions of region~$543$ 
+	obtained by \Astar and the greedy algorithm.
+	In the sequence obtained by \Astar, 
+	a pair of circles or a pair of squares indicates that
+	the two parts are actually in the same patch.
+	The numbers indicate the numbers of patches.
+}
+\label{fig:AreaAgg_CaseStudy1_Rg543}
+\end{figure}
+
+
+\begin{figure}[tb]
+\centering
+\includegraphics[page=3]{AreaAgg_CaseStudy1}
+\caption{An optimal sequence of intermediate subdivisions 
+	of region~$53$ obtained by \Astar 
+	using the costs of type change and compactness.		 
+	The numbers indicate the numbers of patches.		
+}
+\label{fig:AreaAgg_CaseStudy1_Rg53}
+\end{figure}
+
+
+%\todo[inline]{It turned out that the objective function $g$ 
+%seems rather robust
+%	against changes of~$\lambda$.  For region~77, we 
+%	varied~$\lambda$ in
+%	the range $\{0.1,0.5,0.9\}$, but the resulting aggregation 
+%	sequences
+%	stayed almost the same.  When we used even larger 
+%	values 
+%	for~$\lambda$ (e.g.,~$0.99$), the (good) influence of type 
+%	change was mitigated 
+%	and, as a
+%	result, we needed to overestimate (with factor~$K=8$).}
+
+
+
+
+\subsection{Using costs of type change and length}
+\label{sec:AreaAgg_CaseStudy2}
+
+We compare the greedy algorithm, \Astar, and ILP
+using~$g_2(\Pnode)$,
+a combination of the costs 
+of type change and length (see \eq\ref{eq:g_2}).
+For \Astar, we overestimated 
+whenever we could not find a solution after 
+having visited~$W=200{,}000$ nodes 
+(see \sect\ref{sec:AreaAgg_AStar}).
+The most time-consuming instance for \Astar was region~$94$,
+for which \Astar took~$104.1\,$s (including repetitions)
+to find a feasible solution 
+with overestimation factor~$K=31$.
+To avoid waiting too long,
+we set the time limit to~$100\,$s 
+for our ILP to run on one region.
+Note that the time limit included
+the time that our ILP used 
+to set up the variables and constraints
+(see \sects\ref{sub:AreaAgg_variables} 
+and~\ref{sub:AreaAgg_Constraints}).
+If no optimal solution was found in this time limit,
+a feasible solution (if found) would be returned.
+For some large instances, 
+the ILP could not find any solution.
+
+Using a similar format as in 
+\tab\ref{tab:AreaAgg_CaseStudy1_Statistics},
+we present the statistics in 
+\tab\ref{tab:AreaAgg_CaseStudy2_Statistics}.
+\Astar found optimal solutions 
+for~$695$ of the~$734$ regions ($94.7\%$).
+Again, it spent most of the running time 
+on the few regions that needed 
+overestimation:~$5.3\%$ of the regions 
+caused~$92.3\%$ of the total running time.
+The solutions by \Astar cost~$438.2$ in total, 
+which is~$3.9\%$ less than~$455.8$, 
+the total cost of the solutions by the greedy algorithm.
+
+\begin{table*}[tb]
+\caption{A comparison of the greedy algorithm, 
+    the \Astar algorithm, and the ILP-based algorithm		
+	when using cost function~$g_2$ (see \eq\ref{eq:g_2}).
+	The notations are the same as in
+	\tab\ref{tab:AreaAgg_CaseStudy1_Statistics}.
+	%
+	Columns~$\sum g_\mathrm{type}$, $\sum g_\mathrm{lgth}$, 
+	and~$\sum g_2$
+	respectively represent the sums of~$g_\mathrm{type}(\Pgoal)$,
+	$g_\mathrm{lgth}(\Pgoal)$, and~$g_2(\Pgoal)$ 
+	over all the~$734$ instances 
+	(see \eqs\ref{eq:g_type}, \ref{eq:g_length}, 
+	and~\ref{eq:g_2}).
+}
+\label{tab:AreaAgg_CaseStudy2_Statistics}
+%	\includegraphics[page=1]{AreaAgg_CaseStudy2_Plot}
+\centering
+\fontsize{9}{11}\selectfont %for my thesis; should before \setlength{\tabcolsep}{0.7ex}
+\setlength{\tabcolsep}{0.7ex}
+\begin{tabular}{lRRRCCCCCd{3.7}}
+\toprule
+\multicolumn{1}{l}{Methods} &
+\multicolumn{1}{l}{\#OS} &
+\multicolumn{1}{c}{\#FS} &
+\multicolumn{1}{r}{$k_\mathrm{sum}$} &  
+\multicolumn{1}{c}{\#nodes} & 
+\multicolumn{1}{c}{\#arcs} & 
+\multicolumn{1}{c}{$\sum g_\mathrm{type}$} & 
+\multicolumn{1}{c}{$\sum g_\mathrm{lgth}$} & 
+\multicolumn{1}{c}{$\sum g_2$} & 
+\multicolumn{1}{c}{Time (min)} \\ 
+\midrule
+Greedy 		 &430             
+&304~(41.4\%)    
+&            &5.5\cdot 10^3   &4.8\cdot 10^3   
+&53.0        &858.5           &455.8           &0'1~(70.7\%)\\
+%
+%
+\AstarTwo	& 695
+& 39~(\parbox{\widthof{$4$}}{$\,$}$5.3\%$)	
+& 150 	& 3.7\cdot 10^6 & 7.3\cdot 10^6 
+& 52.0 	& 824.5 & 438.2 &44'8~(92.3\%)	\\
+%
+%
+\ILPOne		& 449
+& 69~(\parbox{\widthof{$4$}}{$\,$}$9.4\%$)  			 	
+&		&				&				
+&		&		&		& 421'5~(27.3\%) \\
+%
+%
+\ILPTwo		& 475
+& 57~(\parbox{\widthof{$4$}}{$\,$}$7.8\%$)  			 	
+&		&				&				
+&		&		&		& 719'2~(26.4\%) \\ 
+\bottomrule
+\end{tabular}
+\end{table*}
+
+
+
+
+\Astar managed to find optimal solutions 
+for all the regions with fewer than~$15$ polygons, and 
+found only feasible solutions for the regions 
+with more than~$21$ polygons.
+%
+In the~$39$ (out of~$734$) regions 
+that \Astar failed to solve optimally,
+the greedy algorithm outperformed \Astar 
+for~$8$ regions~($20.5\%$), 
+which is~$26.4\%$ less comparing to the first experiment ($46.9\%$).
+%
+\ILPOne managed to find optimal solutions 
+for all the regions with fewer than~$8$ polygons,
+and failed to find optimal solutions
+for any region with more than~$8$ polygons.
+In none of the~$39$ regions 
+that \Astar failed to solve optimally
+did \ILPOne find a feasible solution.
+Overall, \ILPOne 
+found optimal solutions for~$449$ regions
+and found feasible solutions for~$69$ regions.
+The distributions of these regions are shown in
+\figs\ref{fig:AreaAgg_CaseStudy2_Percentage_Optimal}
+and~\fig\ref{fig:AreaAgg_CaseStudy2_Percentage_Feasible}
+There are~$216$ regions for which 
+our \ILPOne failed to find any solution.
+For~$22$ of those regions, 
+we did not have enough main memory 
+to set up the variables and constraints;
+each of these regions has~$21$ polygons at least.
+For~$67$ of those regions, 
+our \ILPOne ran out of the main memory 
+before finding any feasible solution;
+these regions have~$14$ to~$20$ polygons.
+Note that we allowed our program to use~$3\,$GB 
+of the main memory at most.
+For~$123$ of the $216$~regions, 
+\ILPOne failed to find any solution
+during the time limit;
+these regions have~$9$ to~$13$ polygons.
+For the remaining~$4$ regions, 
+the reason of our ILP's fail is unclear 
+due to the fact that 
+the solver CPLEX is like a black box for us.
+After we increased the time limit to~$200\,$s for each region, 
+\ILPTwo solved~$475$ regions to optimality, which 
+is~$26$ regions more than using \ILPOne.
+Every of the~$26$ regions has~$6$ to~$10$ polygons.
+\fig\ref{fig:AreaAgg_CaseStudy2_Percentage_Optimal}
+shows the percentages of the regions 
+that are solved optimally by the three algorithms.
+\fig\ref{fig:AreaAgg_CaseStudy2_Percentage_Feasible} 
+shows the percentages of the regions 
+that the three algorithms found feasible solutions.
+\fig\ref{fig:AreaAgg_CaseStudy2_ILP} shows 
+the number of regions for which 
+the ILP found optimal, feasible, or no solutions 
+when using the two time limits, i.e., $100\,$s and~$200\,$s.
+
+
+\begin{figure}[tb]
+\centering
+\includegraphics[page=1]{AreaAgg_CaseStudy2_Plot}
+\caption{The percentage of regions that were solved 
+	optimally by the greedy algorithm, \Astar, and our ILP.
+	Note that the numbers of regions according to~$n$ 
+	(the number of polygons on the start map in one region) 
+	are shown in \fig\ref{fig:AreaAgg_NumRegion}.}
+\label{fig:AreaAgg_CaseStudy2_Percentage_Optimal}
+%
+\par\vspace{\baselineskip} %Leave a gap	between figures
+%
+\centering
+\includegraphics[page=2]{AreaAgg_CaseStudy2_Plot}
+\caption{The percentage of regions for which we found at 
+	least feasible solutions by the three algorithms.
+	Note that the numbers of regions according to~$n$ 
+	(the number of polygons on the start map in one region) 
+	are shown in \fig\ref{fig:AreaAgg_NumRegion}.}
+\label{fig:AreaAgg_CaseStudy2_Percentage_Feasible}
+\end{figure}
+
+\begin{figure}[tb]
+\centering
+\includegraphics[page=3]{AreaAgg_CaseStudy2_Plot}
+\caption{The number of regions for which
+	our ILP found optimal, feasible, or no solutions 
+	when using time limits~$100\,$s and~$200\,$s.
+	Using more time, our ILP was able to 
+	solve more instances to optimality.}
+\label{fig:AreaAgg_CaseStudy2_ILP}
+\end{figure}
+
+Among all the instances that were solved to optimality by \Astar
+in both experiments (i.e., \sects\ref{sec:AreaAgg_CaseStudy1} 
+and~\ref{sec:AreaAgg_CaseStudy2}),
+region~$358$ (marked in \tab\ref{tab:CostsInDetail})
+is the largest one.
+In both experiments, the cost of type change is~$0.044$.
+The optimal aggregation sequences for this region
+obtained by using costs~$g_1$ and~$g_2$
+are shown in \fig\ref{fig:AreaAgg_CaseStudy2_Rg358}.
+We, however, noticed some unpleasant aggregates.
+The step from~$8$ patches to~$7$ patches 
+when using cost function~$g_1$ is a bad move
+(see \fig\ref{fig:AreaAgg_CaseStudy2_Rg358}b).
+Instead we expect the result of 
+\fig\ref{fig:AreaAgg_CaseStudy2_Rg358}a.
+Using cost function~$g_2$, we had a similar problem. 
+The subdivision with~$7$ patches is such an example,
+where we expect the result of 
+\fig\ref{fig:AreaAgg_CaseStudy2_Rg358}c.
+In an earlier version of this paper \parencite{Peng2017AStar},
+we tried a combination of minimizing type changes 
+and maximizing the sum of the smallest compactness values, 
+over the whole sequence.
+For that objective, we had a similar problem as 
+in \fig\ref{fig:AreaAgg_CaseStudy2_Rg358}b.
+This problem, however, can be fixed easily 
+by forbidding two patches to aggregate 
+if their common boundary is too short.
+
+
+\begin{figure}[h!tb]
+\centering
+\includegraphics[page=1]{AreaAgg_CaseStudy2}
+\caption{Some intermediate subdivisions of region~$358$ 
+	obtained by \Astar with different cost functions.
+	The numbers indicate the numbers of patches.
+    The step from $8$ patches to $7$ patches 
+    when using cost function~$g1$ is a bad move; see figure (b). 
+    Instead, we expect the result of figure (a). 
+    Using cost function~$g2$, we had a similar problem. 
+    The subdivision with $7$ patches is such an example, 
+    where we expect the result of figure (c).
+}
+\label{fig:AreaAgg_CaseStudy2_Rg358}
+\end{figure}
+
+
+%\todo{chart: memory use of greedy, A*, and ILP}
+
+\section{Concluding Remarks}
+\label{sec:AreaAgg_Conclusions}
+In this paper, we investigated the problem of 
+finding optimal sequences for area aggregation.
+We compared three methods to solve this problem, namely, 
+a greedy algorithm, \Astar, and an ILP-based algorithm.
+The greedy algorithm is used as a benchmark.
+Unsurprisingly, it ran faster than the other two methods by far.
+According to our experiments, \Astar found area aggregation 
+sequences
+with the least total cost over all regions.
+For some instances, however, \Astar had to overestimate
+in order to find feasible solutions.
+Compared to the greedy algorithm, 
+\Astar reduced the total costs by~$2.8\%$ and~$3.9\%$
+in the two experiments.
+Although the amount is small, it is worth to use \Astar
+because optimization methods can help us 
+to evaluate the quality of a model 
+\parencite{Haunert2017Label,Haunert2008Assuring,Haunert2016Optimization}.
+For example, \fig\ref{fig:AreaAgg_CaseStudy2_Rg358}b shows that
+even an \emph{optimal} sequence can be bad.
+If it were not for \Astar, 
+we could not tell if the bad result was caused 
+by the greedy algorithm or the model.
+Because of \Astar, we are sure that the bad result is from
+our model of minimizing the 
+type change and the compactness.
+The ILP-based algorithm finds optimal solutions for some regions,
+but for some of the other regions 
+it cannot even find a feasible solution.
+Compared to the ILP-based algorithm,
+\Astar used less memory 
+yet found optimal solutions for more regions.
+
+%\todo[inline]{estimate compactness based on length; cauchy 
+%schwarz}
+
+Our \Astar has a good estimation for the cost of type 
+change, which helps a lot to reduce the search space. 
+Our estimation for the cost of shape 
+(compactness or length) is poor.
+There are two ways to improve \Astar
+in terms of solving more instances to optimality 
+while using the same limit of main memory.
+First, during the searching we can forget a node of the graph
+(see \fig\ref{fig:AreaAgg_SubdivisionName})
+if all the neighbors of this node have been visited.
+By testing a case, we learned that half of the nodes can be 
+forgotten during the pathfinding process.
+In this way, we can release some main memory 
+and visit more nodes.
+Once we arrive at the goal, 
+we know the cost for 
+an optimal solution (the least cost).
+As many visited nodes have been forgotten, 
+we do not have the shortest path so far.
+We need to run \Astar again.
+This time we know for sure that 
+a path is not optimal if its cost, 
+the sum of the exact cost and the estimated cost, 
+is more than the least cost 
+(of the optimal solution found previously).
+Consequently, we are able to prune some branches earlier 
+than the first time we run \Astar.
+In this way, we manage to save some main memory.
+As a result, we are more likely to find optimal solutions
+when the main memory is limited.
+Second, if we obtain a solution based on overestimation, 
+then we know the cost of this non-optimal solution.
+We may decrease the overestimation factor by pruning the branches
+that cost more than the non-optimal solution.
+
+
+We may speed up our ILP-based algorithm using a so-called 
+cutting-plane approach as \textcite{Oehrlein2017Aggregation}.
+Also, we can add more constraints to
+reduce the choices of variables.
+For example, assignment to a given center~$r$ is symmetric, 
+hence we have
+\begin{equation*}
+\label{eq:CstrZX}
+z_{t,p,q,r}= z_{t,q,p,r} \qquad
+\forall t \in {T} \setminus \{1,n\}, 
+\forall p, q, r \in P.
+\end{equation*}
+Whether adding such kinds of constraints always
+speeds up our ILP is not clear
+because the solver, CPLEX, is a black box to us.
+Although integer linear programming may be not good at 
+finding optimal sequences for area aggregation,
+it is relatively easy to formulate problems as ILPs.
+As stated by \citet[p.~861]{Cormen2009}, 
+``an efficient algorithm designed specifically for a problem 
+will often be more efficient than 
+linear programming both in theory and in practice. 
+The real power of linear programming comes from 
+the ability to solve new problems.''
+
+We may improve both the \Astar algorithm and the ILP-based 
+algorithm by integrating the greedy algorithm.
+The idea is that we use the greedy algorithm to find 
+a solution. 
+Then we can use the cost of the solution as an upper bound to 
+prune the branches of \Astar and the ILP. 
+Once we see that
+the cost of a branch is larger than the upper bound,
+we can ignore that branch  
+because it will not yield an optimal solution.
+
+
+
+In cartography, there are many more requirements 
+for area aggregation.
+For example, one requirement is 
+to keep important land-cover areas for a longer time
+(such as a settlement surrounded by farmlands).
+This requirement can be achieved by incorporating the idea of
+\textcite{Dilo2009tGAP}.
+They gave each type a weight, 
+then defined the importance of a patch 
+by the product of the area size and the type weight.
+While in our method, we used only the area size as importance.
+%
+Another requirement is that 
+aggregating two areas may result in 
+an area with a generalized type,
+as did by \textcite{vanSmaalen2003}. 
+For example, aggregating 
+\emph{farmland} with \emph{hedge} 
+yields an area with type \emph{vegetation}.
+%
+These issues can be considered in our future work.
+%
+
+
+
+
+
+\begin{acks}
+We thank Thomas C. van Dijk, Joachim Spoerhase, 
+and Sabine Storandt for their valuable suggestions.
+We thank Martijn Meijers for 
+prereviewing an earlier version of this paper.
+\end{acks}
+
+
+\printbibliography
+
+\appendix
+\section{Formulation of Integer Linear Programming}
+\label{app:AreaAgg_ILP}
 
 \emph{Linear programming} is a method 
 to optimize a \emph{linear objective}
@@ -2516,845 +3402,5 @@ involving a smallest patch at each step,
 we need all the five types of variables and all the
 constraints~(\ref{eq:CstrOneCenter})--(\ref{eq:CstrSIndeedSmallest}).
 In total, the number of constraints is~$O(n^4)$.
-
-\section{Case Study}
-\label{sec:AreaAgg_CaseStudy}
-We have implemented our methods 
-based on C\# (Microsoft Visual Studio~2017) 
-and ArcObjects SDK~10.6.0.
-We used the IBM ILOG
-CPLEX Optimization Studio~12.6.3.0 to solve our ILP.
-Our prototype is open access on GitHub\footnote{%
-\url{https://github.com/IGNF/ContinuousGeneralisation},
-Accessed: Jun 18, 2018.}.
-We ran our case study
-under 64-bit Windows~10 
-on Intel(R) Core(TM) i7-6700 CPU @~$3.40\,$GHz with~$4$ cores;
-the computer has $16\,$GB RAM.
-We measured processing time 
-by the built-in C\# class \emph{Stopwatch}.
-As required by ArcObjects SDK~10.6.0,
-we specified our program to run on the~$32$-bit platform. 
-We added a post-build task about ``largeaddressaware''
-in Microsoft Visual Studio so that 
-we were able to use up to~$3\,$GB of the 
-main memory\footnote{The details of the setting can be found at \url
-{http://stackoverflow.com/questions/2597790/can-i-set-largeaddressaware-from-within-visual-studio},
-Accessed: Nov 1, 2017.}.
-Our CPLEX version may declare an optimal solution
-while it is not really optimal.
-To fix this problem, we had to disable 
-both primal and dual presolve 
-reductions\footnote{For more details about the problem, see
-\url{http://www-01.ibm.com/support/docview.wss?uid=swg1RS02094},
-Accessed: Nov 12, 2017.}.
-
-We tested our method on a dataset 
-from the German topographic database ATKIS DLM~50. 
-The dataset represents the place 
-``Buchholz in der Nordheide'' at scale~$1:50{,}000$. 
-Our start map is the result of collapsing areas 
-by \citet[\chap6]{haunert2008f}.
-The start map has~$5{,}537$ polygons. 
-Our goal map was generalized from the start map 
-by~\citet{HaunertWolff2010AreaAgg}, setting the scale 
-to~$1:250{,}000$ (see \fig\ref{fig:AreaAgg_Data}). 
-The goal map has~$734$ polygons, 
-which means that there are~$N=734$ regions.
-The distribution of region sizes is shown in 
-\fig\ref{fig:AreaAgg_NumRegion}.
-%
-We used a tree-based method introduced by 
-\citet{Rada1989SemanticMetric} 
-to define the distances of the types;
-the distance is the ``number of edges'' that
-we need to travel from one node to another node in the tree of 
-type hierarchy\footnote{More information 
-    about land-cover types can be found at 
-%	\url{http://www.atkis.de/dstinfo/dstinfo2.dst_gliederung},
-	Accessed: Nov 1, 2017.}
-(see \fig\ref{fig:AreaAgg_TypeDistances}). 
-For example, the distance from type \emph{village}
-to type \emph{fence} is~$2$, 
-to type \emph{street} is~$4$, and
-to type \emph{farm land} is~$6$.
-In this tree, the maximum distance is~$6$, 
-which means~$T_\mathrm{max}=6$ for \eq\ref{eq:f_type}.
-According to \citet{Rada1989SemanticMetric}, 
-the resulting cost function for type change is a metric.
-
-
-\begin{figure}[tb]
-%\captionsetup[subfigure]{labelformat=empty}
-\begin{subfigure}[b]{.49\textwidth}
-\centering
-\includegraphics[page=1]{AreaAgg_Data}
-\caption{Start map, $5{,}537$ polygons, \\
-	at scale $1:50{,}000$}
-\end{subfigure}
-\hfill
-\begin{subfigure}[b]{.49\textwidth}
-\centering
-\includegraphics[page=2]{AreaAgg_Data}
-\caption{Goal map, $734$ polygons, \\
-	at scale $1:250{,}000$}
-\end{subfigure}
-%
-%It doesn't work to directly use 
-%\vspace{\baselineskip} for subfigures.
-\par\vspace{\baselineskip} %Leave a gap	figures
-%
-\begin{subfigure}{\textwidth}
-\centering
-\includegraphics[page=3]{AreaAgg_Data}
-\caption{The 20 land-cover types appearing in our data}
-\end{subfigure}
-\caption{The data of our case study.}
-\label{fig:AreaAgg_Data}
-\end{figure}
-
-\begin{figure}[tb]
-\centering
-\includegraphics[page=4]{AreaAgg_Data}
-\caption{Distribution of the region sizes:
-	the $y$-axis shows how many regions 
-	of a given size range are contained in our dataset.}
-\label{fig:AreaAgg_NumRegion}
-\end{figure}
-
-\begin{figure}[tb]
-\centering
-\includegraphics[page=5]{AreaAgg_Data}
-\caption{The tree of type hierarchy used in our case study.
-	For example, the distance between 
-	types \emph{village} and \emph{farm land} is~$6$.}
-\label{fig:AreaAgg_TypeDistances}
-\end{figure}
-
-\subsection{Using costs of type change and compactness}
-\label{sec:AreaAgg_CaseStudy1}
-
-As illustrated in \sect\ref{sec:AreaAgg_Combining},
-we compare \Astar and the greedy algorithm using $g_1(\Pnode)$,
-which is a combination of the costs 
-of type change and compactness (see \eq\ref{eq:g_1}).
-For \Astar, we overestimated 
-whenever we could not find a solution after 
-having visited~$W$ nodes 
-(see \sect\ref{sec:AreaAgg_AStar}).
-We tried~$W=200{,}000$ and~$W=400{,}000$
-(if we could use more main memory, 
-then we could test by using some larger~$W$). 
-The results are shown in 
-Table~\ref{tab:AreaAgg_CaseStudy1_Statistics}.
-%
-Comparing to \Astar, 
-the greedy algorithm visited 
-fewer nodes and arcs in graph~$G_\mathrm{S}$ 
-and used much less time.
-However, \Astar managed to find solutions with 
-lower total cost,~$117.3$ (or~$117.2$), 
-which is~$2.8\%$ less than 
-the total cost of the greedy algorithm,~$120.7$.
-%
-When~$W=200{,}000$, we are sure that 
-we have found optimal solutions 
-for~$702$ of the~$734$ regions ($95.6\%$),
-while the greedy algorithm solved 
-only~$408$ ($55.6\%$) to optimality;
-see column \#OS in 
-Table~\ref{tab:AreaAgg_CaseStudy1_Statistics}.
-For the other~$32$ regions, 
-both algorithms have found feasible solutions 
-(see column \#FS in 
-Table~\ref{tab:AreaAgg_CaseStudy1_Statistics}).
-Although some of the feasible solutions may also be optimal,
-we cannot verify that only from the cost values.
-
-
-\begin{table*}[tb]
-\caption{A comparison of the greedy algorithm and \Astar		
-	when using cost function~$g_1$ (see \eq\ref{eq:g_1}).
-	For \Astar, we used two settings, 
-	i.e.,~$W=200{,}000$ and~$W=400{,}000$.
-	%
-	Column~\#OS shows the numbers of regions 
-    that we obtained optimal solutions.   
-	%
-	Column~\#FS presents 
-    the numbers and the percentages of regions (out of~$N=734$) 
-    that we obtained feasible (non-optimal) solutions.
-	%
-	Variable~$k_\mathrm{sum}$ is 
-	the total number of repetitions.
-	%
-	Columns~\#nodes and~\#arcs are the total 
-	numbers of nodes and arcs that \Astar visited  
-	(for instances where we needed overestimation, 
-	only the final attempt was counted).
-	%
-	Columns~$\sum g_\mathrm{type}$, $\sum g_\mathrm{comp}$, 
-	and~$\sum g_1$
-	respectively denotes the sums of~$g_\mathrm{type}(\Pgoal)$,
-	$g_\mathrm{comp}(\Pgoal)$, and~$g_1(\Pgoal)$ 
-	over all the~$734$ instances 
-	(see \eqs\ref{eq:g_type}, \ref{eq:g_comp}, 
-	and~\ref{eq:g_1}).
-	%
-	The percentage in the \emph{Time}
-	column is the fraction of the runtime 
-    spent on solving the instances
-	that we obtained feasible solutions.
-    For \Astar, the time needed for overestimation
-    is included.
-}
-\label{tab:AreaAgg_CaseStudy1_Statistics}
-\centering
-\fontsize{9}{11}\selectfont %for my thesis; should before \setlength{\tabcolsep}{0.7ex}
-\setlength{\tabcolsep}{0.7ex}
-\begin{tabular}{lRRRCCCCCd{3.7}}
-\toprule
-\multicolumn{1}{l}{Methods} &
-\multicolumn{1}{l}{\#OS} &
-\multicolumn{1}{c}{\#FS} &
-\multicolumn{1}{r}{$k_\mathrm{sum}$} &  
-\multicolumn{1}{c}{\#nodes} & 
-\multicolumn{1}{c}{\#arcs} & 
-\multicolumn{1}{c}{$\sum g_\mathrm{type}$} & 
-\multicolumn{1}{c}{$\sum g_\mathrm{comp}$} & 
-\multicolumn{1}{c}{$\sum g_1$} & 
-\multicolumn{1}{c}{Time (min)} \\ 
-\midrule
-Greedy 	& 408 
-&326~(44.4\%) 
-&             &5.5\cdot 10^3   &4.8\cdot 10^3   
-&53.2         &188.2           &120.7           &0'1~(74.6\%)\\
-%
-%
-\AstarTwo	& 702 
-&  32~(\parbox{\widthof{$4$}}{$\,$}$4.4\%$) 
-& 102 &  3.6\cdot 10^6 &    5.7\cdot 10^6	
-& 51.4 & 183.2 & 117.3 & 51'6~(93.2\%)\\
-%
-%
-\AstarFour	& 704 
-&  30~(\parbox{\widthof{$4$}}{$\,$}$4.1\%$)
-&  89 &  6.5\cdot 10^6 &    9.8\cdot 10^6
-& 51.4 & 183.1 & 117.2 & 93'1~(95.5\%)
-\\ \bottomrule			
-\end{tabular}
-\end{table*}
-
-
-In accordance with \sect\ref{sec:AreaAgg_AStar}, 
-for region with ID~$i$ 
-we define~$k_i$ as the least number of repetitions 
-that we do to find a feasible solution. 
-We define the total number of repetitions 
-as~$k_\mathrm{sum}=\sum_{i=1}^N k_i$, 
-where~$N=734$ is the number of the regions.
-After increasing~$W$ to~$400{,}000$, 
-\Astar found optimal aggregation sequences 
-for only two more regions, 
-but $k_\mathrm{sum}$ decreased quite a bit, 
-from~$102$ to~$89$. 
-The numbers of regions that needed certain
-overestimation steps are shown in 
-\fig\ref{fig:AreaAgg_OverStats}. 
-Besides, \Astar visited more arcs and nodes, 
-used more time, 
-but got (slightly) less cost when increasing~$W$ to~$400{,}000$.
-Although the number of regions 
-that needed overestimation is relatively small, 
-\Astar spent most of the running time 
-on those few regions:~$4.4\%$ and~$4.1\%$ of the regions 
-caused~$93.2\%$ and~$95.5\%$ of the total running time, 
-respectively 
-(see Table~\ref{tab:AreaAgg_CaseStudy1_Statistics}).
-
-\begin{figure}[tb]
-\centering
-\includegraphics[page=2]{AreaAgg_CaseStudy1_Plot}
-\caption{The numbers of regions where \Astar was 
-	forced to use the given overestimation parameters
-	in order to find a solution 
-	without exploring more than 
-	$W \in \{200{,}000;~400{,}000\}$ 
-	nodes of the subdivision graph.}
-\label{fig:AreaAgg_OverStats}
-\end{figure}
-
-The details of some regions are presented in 
-Table~\ref{tab:CostsInDetail}.
-According to the entries with overestimation factor $K_i=0$, 
-we often have 
-ratios~$R_\mathrm{type}=1$ and~$R_\mathrm{comp}>1$.
-When factor~$K_i=0$, we did not overestimate for region~$i$.
-The estimated cost must be smaller or equal to the exact cost,
-which results in~$R_\mathrm{type}\ge 1$ 
-and~$R_\mathrm{comp}\ge 1$.
-Ratio~$R_\mathrm{type} = 1$ means that our estimation for the 
-cost of type change is the best.
-A larger~$R_\mathrm{comp}$ means 
-a poorer estimation for the cost of shape.
-
-\begin{table*}[tb]
-\caption{The costs in detail of some regions, 
-	where~$W=200{,}000$.  
-	Parameters~$n$ and~$m$ are the numbers of patches and 
-	adjacencies on the start map, respectively.
-	Parameter $K$ is the overestimation factor, 
-	defined in \sect\ref{sec:AreaAgg_Preliminaries}. 
-	We evaluate the quality 
-	of our estimations for type change and 
-	compactness by listing the numbers~
-	$R_\mathrm{type}=g_\mathrm{type}(\Pgoal)
-	/h_\mathrm{type}(\Pstart)$ and~
-	$R_\mathrm{comp}=g_\mathrm{comp}(\Pgoal)
-	/h_\mathrm{comp}(\Pstart)$. 
-	Note that if~$h_\mathrm{type}(\Pstart)=0$,
-    then we have~$g_\mathrm{type}(\Pgoal)=0$; 
-	in this case, we define~$R_\mathrm{type}=1$.
-	The marked entries are discussed in the text.
-}
-\label{tab:CostsInDetail}
-\centering
-\includegraphics[page=3]{AreaAgg_CaseStudy1_Plot}
-\end{table*}
-
-
-According to columns~$n$ and~$K$ of \tab\ref{tab:CostsInDetail},
-\AstarTwo managed to find optimal solutions 
-for all the regions with fewer than~$15$ polygons,
-and only found feasible solutions 
-for any region with more than~$21$ polygons.
-Among the~$702$ regions that 
-\AstarTwo solved to optimality,
-the greedy algorithm failed to 
-find optimal solutions for~$294$ regions.
-Solutions of the greedy algorithm cost
-at most~$41.7\%$ more than 
-solutions of \AstarTwo;
-for region~$85$, the greedy algorithm yields 
-a solution of cost~$0.777$, 
-while the solution of \AstarTwo has cost~$0.548$
-(see \fig\ref{fig:AreaAgg_CaseStudy1_Rg85}).
-As the patches in the two sequences are the same,
-the two results have the same cost of compactness.
-The main difference is the choice of the first step, 
-from~$8$ patches to~$7$.
-When aggregating the smallest patch on the start map
-with the surrounding patch,
-our greedy algorithm chooses the type 
-which is closer to the goal type.
-In this case, the smallest patch has type~$5112$, and the 
-surrounding one has~$2112$.
-The type of the goal patch is~$4102$.
-According to \fig\ref{fig:AreaAgg_TypeDistances},
-type distances~$d(5112,4102)=4$ and~$d(2112,4102)=6$.
-As a result, our greedy algorithm uses~$5112$ 
-as the type for the new patch. 
-This choice is a big mistake 
-because the type of the largest patch on the start map
-will have to be changed twice during the aggregation.
-These changes cause a cost more than the sequence obtained by 
-\AstarTwo, 
-where the largest patch on the start map is changed to 
-the target type directly.
-
-Among the $32$~regions that 
-\AstarTwo failed to solve optimally,
-the greedy algorithm outperformed \AstarTwo 
-for~$15$ regions ($46.9\%$).
-%
-Among these, solutions of the greedy algorithm 
-cost at most~$15.9\%$ less than solutions of \AstarTwo;
-for region~$543$, the greedy algorithm yields 
-a solution of cost~$0.112$, 
-while the solution of \AstarTwo costs~$0.134$. 
-For this instance, 
-\AstarTwo used overestimation parameter~$K=7$
-(marked in \tab\ref{tab:CostsInDetail}).
-\fig\ref{fig:AreaAgg_CaseStudy1_Rg543} shows 
-some intermediate results obtained by
-\AstarTwo and the greedy algorithm.
-Interestingly, the two methods produced the same sequence until 
-there were~$8$ patches left.
-Then due to the overestimation, 
-\AstarTwo did some bad moves
-because the bad aggregation sequence still seemed better 
-than other sequences.
-In contrast, the greedy algorithm was looking for locally good 
-aggregations.
-%
-Among the~$32$ regions that 
-\AstarTwo failed to solve optimally,  
-solutions of the greedy algorithm cost at most~$17.4\%$ 
-more than solutions of \AstarTwo; 
-for region~$155$, the greedy algorithm yields 
-a solution of cost~$0.372$, while
-the solution of \AstarTwo costs~$0.317$
-(marked in \tab\ref{tab:CostsInDetail}).
-
-Finally, an optimal aggregation sequence of region~$53$
-(third-last row in \tab\ref{tab:CostsInDetail})
-obtained by \AstarTwo
-is shown in \fig\ref{fig:AreaAgg_CaseStudy1_Rg53}.
-
-\begin{figure}[tb]
-\centering
-\includegraphics[page=1]{AreaAgg_CaseStudy1}
-\caption{Aggregation sequences of region~$85$ 
-	obtained by \Astar and the greedy algorithm.
-	In order to save space, we did not show the results 
-	when there are~$4$ or~$5$ patches, 
-	which one can easily deduce.
-	The numbers indicate the numbers of patches.
-    %
-    In the sequence obtained by \Astar, 
-    the type of the largest polygon on the start map 
-    changed only once, which is good; 
-    while the type of the largest polygon changed twice 
-    in the sequence obtained by the Greedy algorithm.}
-\label{fig:AreaAgg_CaseStudy1_Rg85}
-\end{figure}
-
-\begin{figure}[tb]
-\centering
-\includegraphics[page=2]{AreaAgg_CaseStudy1}
-\caption{Some intermediate subdivisions of region~$543$ 
-	obtained by \Astar and the greedy algorithm.
-	In the sequence obtained by \Astar, 
-	a pair of circles or a pair of squares indicates that
-	the two parts are actually in the same patch.
-	The numbers indicate the numbers of patches.
-}
-\label{fig:AreaAgg_CaseStudy1_Rg543}
-\end{figure}
-
-
-\begin{figure}[tb]
-\centering
-\includegraphics[page=3]{AreaAgg_CaseStudy1}
-\caption{An optimal sequence of intermediate subdivisions 
-	of region~$53$ obtained by \Astar 
-	using the costs of type change and compactness.		 
-	The numbers indicate the numbers of patches.		
-}
-\label{fig:AreaAgg_CaseStudy1_Rg53}
-\end{figure}
-
-
-%\todo[inline]{It turned out that the objective function $g$ 
-%seems rather robust
-%	against changes of~$\lambda$.  For region~77, we 
-%	varied~$\lambda$ in
-%	the range $\{0.1,0.5,0.9\}$, but the resulting aggregation 
-%	sequences
-%	stayed almost the same.  When we used even larger 
-%	values 
-%	for~$\lambda$ (e.g.,~$0.99$), the (good) influence of type 
-%	change was mitigated 
-%	and, as a
-%	result, we needed to overestimate (with factor~$K=8$).}
-
-
-
-
-\subsection{Using costs of type change and length}
-\label{sec:AreaAgg_CaseStudy2}
-
-We compare the greedy algorithm, \Astar, and ILP
-using~$g_2(\Pnode)$,
-a combination of the costs 
-of type change and length (see \eq\ref{eq:g_2}).
-For \Astar, we overestimated 
-whenever we could not find a solution after 
-having visited~$W=200{,}000$ nodes 
-(see \sect\ref{sec:AreaAgg_AStar}).
-The most time-consuming instance for \Astar was region~$94$,
-for which \Astar took~$104.1\,$s (including repetitions)
-to find a feasible solution 
-with overestimation factor~$K=31$.
-To avoid waiting too long,
-we set the time limit to~$100\,$s 
-for our ILP to run on one region.
-Note that the time limit included
-the time that our ILP used 
-to set up the variables and constraints
-(see \sects\ref{sub:AreaAgg_variables} 
-and~\ref{sub:AreaAgg_Constraints}).
-If no optimal solution was found in this time limit,
-a feasible solution (if found) would be returned.
-For some large instances, 
-the ILP could not find any solution.
-
-Using a similar format as in 
-\tab\ref{tab:AreaAgg_CaseStudy1_Statistics},
-we present the statistics in 
-\tab\ref{tab:AreaAgg_CaseStudy2_Statistics}.
-\Astar found optimal solutions 
-for~$695$ of the~$734$ regions ($94.7\%$).
-Again, it spent most of the running time 
-on the few regions that needed 
-overestimation:~$5.3\%$ of the regions 
-caused~$92.3\%$ of the total running time.
-The solutions by \Astar cost~$438.2$ in total, 
-which is~$3.9\%$ less than~$455.8$, 
-the total cost of the solutions by the greedy algorithm.
-
-\begin{table*}[tb]
-\caption{A comparison of the greedy algorithm, 
-    the \Astar algorithm, and the ILP-based algorithm		
-	when using cost function~$g_2$ (see \eq\ref{eq:g_2}).
-	The notations are the same as in
-	\tab\ref{tab:AreaAgg_CaseStudy1_Statistics}.
-	%
-	Columns~$\sum g_\mathrm{type}$, $\sum g_\mathrm{lgth}$, 
-	and~$\sum g_2$
-	respectively represent the sums of~$g_\mathrm{type}(\Pgoal)$,
-	$g_\mathrm{lgth}(\Pgoal)$, and~$g_2(\Pgoal)$ 
-	over all the~$734$ instances 
-	(see \eqs\ref{eq:g_type}, \ref{eq:g_length}, 
-	and~\ref{eq:g_2}).
-}
-\label{tab:AreaAgg_CaseStudy2_Statistics}
-%	\includegraphics[page=1]{AreaAgg_CaseStudy2_Plot}
-\centering
-\fontsize{9}{11}\selectfont %for my thesis; should before \setlength{\tabcolsep}{0.7ex}
-\setlength{\tabcolsep}{0.7ex}
-\begin{tabular}{lRRRCCCCCd{3.7}}
-\toprule
-\multicolumn{1}{l}{Methods} &
-\multicolumn{1}{l}{\#OS} &
-\multicolumn{1}{c}{\#FS} &
-\multicolumn{1}{r}{$k_\mathrm{sum}$} &  
-\multicolumn{1}{c}{\#nodes} & 
-\multicolumn{1}{c}{\#arcs} & 
-\multicolumn{1}{c}{$\sum g_\mathrm{type}$} & 
-\multicolumn{1}{c}{$\sum g_\mathrm{lgth}$} & 
-\multicolumn{1}{c}{$\sum g_2$} & 
-\multicolumn{1}{c}{Time (min)} \\ 
-\midrule
-Greedy 		 &430             
-&304~(41.4\%)    
-&            &5.5\cdot 10^3   &4.8\cdot 10^3   
-&53.0        &858.5           &455.8           &0'1~(70.7\%)\\
-%
-%
-\AstarTwo	& 695
-& 39~(\parbox{\widthof{$4$}}{$\,$}$5.3\%$)	
-& 150 	& 3.7\cdot 10^6 & 7.3\cdot 10^6 
-& 52.0 	& 824.5 & 438.2 &44'8~(92.3\%)	\\
-%
-%
-\ILPOne		& 449
-& 69~(\parbox{\widthof{$4$}}{$\,$}$9.4\%$)  			 	
-&		&				&				
-&		&		&		& 421'5~(27.3\%) \\
-%
-%
-\ILPTwo		& 475
-& 57~(\parbox{\widthof{$4$}}{$\,$}$7.8\%$)  			 	
-&		&				&				
-&		&		&		& 719'2~(26.4\%) \\ 
-\bottomrule
-\end{tabular}
-\end{table*}
-
-
-
-
-\Astar managed to find optimal solutions 
-for all the regions with fewer than~$15$ polygons, and 
-found only feasible solutions for the regions 
-with more than~$21$ polygons.
-%
-In the~$39$ (out of~$734$) regions 
-that \Astar failed to solve optimally,
-the greedy algorithm outperformed \Astar 
-for~$8$ regions~($20.5\%$), 
-which is~$26.4\%$ less comparing to the first experiment ($46.9\%$).
-%
-\ILPOne managed to find optimal solutions 
-for all the regions with fewer than~$8$ polygons,
-and failed to find optimal solutions
-for any region with more than~$8$ polygons.
-In none of the~$39$ regions 
-that \Astar failed to solve optimally
-did \ILPOne find a feasible solution.
-Overall, \ILPOne 
-found optimal solutions for~$449$ regions
-and found feasible solutions for~$69$ regions.
-The distributions of these regions are shown in
-\figs\ref{fig:AreaAgg_CaseStudy2_Percentage_Optimal}
-and~\fig\ref{fig:AreaAgg_CaseStudy2_Percentage_Feasible}
-There are~$216$ regions for which 
-our \ILPOne failed to find any solution.
-For~$22$ of those regions, 
-we did not have enough main memory 
-to set up the variables and constraints;
-each of these regions has~$21$ polygons at least.
-For~$67$ of those regions, 
-our \ILPOne ran out of the main memory 
-before finding any feasible solution;
-these regions have~$14$ to~$20$ polygons.
-Note that we allowed our program to use~$3\,$GB 
-of the main memory at most.
-For~$123$ of the $216$~regions, 
-\ILPOne failed to find any solution
-during the time limit;
-these regions have~$9$ to~$13$ polygons.
-For the remaining~$4$ regions, 
-the reason of our ILP's fail is unclear 
-due to the fact that 
-the solver CPLEX is like a black box for us.
-After we increased the time limit to~$200\,$s for each region, 
-\ILPTwo solved~$475$ regions to optimality, which 
-is~$26$ regions more than using \ILPOne.
-Every of the~$26$ regions has~$6$ to~$10$ polygons.
-\fig\ref{fig:AreaAgg_CaseStudy2_Percentage_Optimal}
-shows the percentages of the regions 
-that are solved optimally by the three algorithms.
-\fig\ref{fig:AreaAgg_CaseStudy2_Percentage_Feasible} 
-shows the percentages of the regions 
-that the three algorithms found feasible solutions.
-\fig\ref{fig:AreaAgg_CaseStudy2_ILP} shows 
-the number of regions for which 
-the ILP found optimal, feasible, or no solutions 
-when using the two time limits, i.e., $100\,$s and~$200\,$s.
-
-
-\begin{figure}[tb]
-\centering
-\includegraphics[page=1]{AreaAgg_CaseStudy2_Plot}
-\caption{The percentage of regions that were solved 
-	optimally by the greedy algorithm, \Astar, and our ILP.
-	Note that the numbers of regions according to~$n$ 
-	(the number of polygons on the start map in one region) 
-	are shown in \fig\ref{fig:AreaAgg_NumRegion}.}
-\label{fig:AreaAgg_CaseStudy2_Percentage_Optimal}
-%
-\par\vspace{\baselineskip} %Leave a gap	between figures
-%
-\centering
-\includegraphics[page=2]{AreaAgg_CaseStudy2_Plot}
-\caption{The percentage of regions for which we found at 
-	least feasible solutions by the three algorithms.
-	Note that the numbers of regions according to~$n$ 
-	(the number of polygons on the start map in one region) 
-	are shown in \fig\ref{fig:AreaAgg_NumRegion}.}
-\label{fig:AreaAgg_CaseStudy2_Percentage_Feasible}
-\end{figure}
-
-\begin{figure}[tb]
-\centering
-\includegraphics[page=3]{AreaAgg_CaseStudy2_Plot}
-\caption{The number of regions for which
-	our ILP found optimal, feasible, or no solutions 
-	when using time limits~$100\,$s and~$200\,$s.
-	Using more time, our ILP was able to 
-	solve more instances to optimality.}
-\label{fig:AreaAgg_CaseStudy2_ILP}
-\end{figure}
-
-Among all the instances that were solved to optimality by \Astar
-in both experiments (i.e., \sects\ref{sec:AreaAgg_CaseStudy1} 
-and~\ref{sec:AreaAgg_CaseStudy2}),
-region~$358$ (marked in \tab\ref{tab:CostsInDetail})
-is the largest one.
-In both experiments, the cost of type change is~$0.044$.
-The optimal aggregation sequences for this region
-obtained by using costs~$g_1$ and~$g_2$
-are shown in \fig\ref{fig:AreaAgg_CaseStudy2_Rg358}.
-We, however, noticed some unpleasant aggregates.
-The step from~$8$ patches to~$7$ patches 
-when using cost function~$g_1$ is a bad move
-(see \fig\ref{fig:AreaAgg_CaseStudy2_Rg358}b).
-Instead we expect the result of 
-\fig\ref{fig:AreaAgg_CaseStudy2_Rg358}a.
-Using cost function~$g_2$, we had a similar problem. 
-The subdivision with~$7$ patches is such an example,
-where we expect the result of 
-\fig\ref{fig:AreaAgg_CaseStudy2_Rg358}c.
-In an earlier version of this paper \parencite{Peng2017AStar},
-we tried a combination of minimizing type changes 
-and maximizing the sum of the smallest compactness values, 
-over the whole sequence.
-For that objective, we had a similar problem as 
-in \fig\ref{fig:AreaAgg_CaseStudy2_Rg358}b.
-This problem, however, can be fixed easily 
-by forbidding two patches to aggregate 
-if their common boundary is too short.
-
-
-\begin{figure}[h!tb]
-\centering
-\includegraphics[page=1]{AreaAgg_CaseStudy2}
-\caption{Some intermediate subdivisions of region~$358$ 
-	obtained by \Astar with different cost functions.
-	The numbers indicate the numbers of patches.
-    The step from $8$ patches to $7$ patches 
-    when using cost function~$g1$ is a bad move; see figure (b). 
-    Instead, we expect the result of figure (a). 
-    Using cost function~$g2$, we had a similar problem. 
-    The subdivision with $7$ patches is such an example, 
-    where we expect the result of figure (c).
-}
-\label{fig:AreaAgg_CaseStudy2_Rg358}
-\end{figure}
-
-
-%\todo{chart: memory use of greedy, A*, and ILP}
-
-\section{Concluding Remarks}
-\label{sec:AreaAgg_Conclusions}
-In this paper, we investigated the problem of 
-finding optimal sequences for area aggregation.
-We compared three methods to solve this problem, namely, 
-a greedy algorithm, \Astar, and an ILP-based algorithm.
-The greedy algorithm is used as a benchmark.
-Unsurprisingly, it ran faster than the other two methods by far.
-According to our experiments, \Astar found area aggregation 
-sequences
-with the least total cost over all regions.
-For some instances, however, \Astar had to overestimate
-in order to find feasible solutions.
-Compared to the greedy algorithm, 
-\Astar reduced the total costs by~$2.8\%$ and~$3.9\%$
-in the two experiments.
-Although the amount is small, it is worth to use \Astar
-because optimization methods can help us 
-to evaluate the quality of a model 
-\parencite{Haunert2017Label,Haunert2008Assuring,Haunert2016Optimization}.
-For example, \fig\ref{fig:AreaAgg_CaseStudy2_Rg358}b shows that
-even an \emph{optimal} sequence can be bad.
-If it were not for \Astar, 
-we could not tell if the bad result was caused 
-by the greedy algorithm or the model.
-Because of \Astar, we are sure that the bad result is from
-our model of minimizing the 
-type change and the compactness.
-The ILP-based algorithm finds optimal solutions for some regions,
-but for some of the other regions 
-it cannot even find a feasible solution.
-Compared to the ILP-based algorithm,
-\Astar used less memory 
-yet found optimal solutions for more regions.
-
-%\todo[inline]{estimate compactness based on length; cauchy 
-%schwarz}
-
-Our \Astar has a good estimation for the cost of type 
-change, which helps a lot to reduce the search space. 
-Our estimation for the cost of shape 
-(compactness or length) is poor.
-There are two ways to improve \Astar
-in terms of solving more instances to optimality 
-while using the same limit of main memory.
-First, during the searching we can forget a node of the graph
-(see \fig\ref{fig:AreaAgg_SubdivisionName})
-if all the neighbors of this node have been visited.
-By testing a case, we learned that half of the nodes can be 
-forgotten during the pathfinding process.
-In this way, we can release some main memory 
-and visit more nodes.
-Once we arrive at the goal, 
-we know the cost for 
-an optimal solution (the least cost).
-As many visited nodes have been forgotten, 
-we do not have the shortest path so far.
-We need to run \Astar again.
-This time we know for sure that 
-a path is not optimal if its cost, 
-the sum of the exact cost and the estimated cost, 
-is more than the least cost 
-(of the optimal solution found previously).
-Consequently, we are able to prune some branches earlier 
-than the first time we run \Astar.
-In this way, we manage to save some main memory.
-As a result, we are more likely to find optimal solutions
-when the main memory is limited.
-Second, if we obtain a solution based on overestimation, 
-then we know the cost of this non-optimal solution.
-We may decrease the overestimation factor by pruning the branches
-that cost more than the non-optimal solution.
-
-
-We may speed up our ILP-based algorithm using a so-called 
-cutting-plane approach as \textcite{Oehrlein2017Aggregation}.
-Also, we can add more constraints to
-reduce the choices of variables.
-For example, assignment to a given center~$r$ is symmetric, 
-hence we have
-\begin{equation*}
-\label{eq:CstrZX}
-z_{t,p,q,r}= z_{t,q,p,r} \qquad
-\forall t \in {T} \setminus \{1,n\}, 
-\forall p, q, r \in P.
-\end{equation*}
-Whether adding such kinds of constraints always
-speeds up our ILP is not clear
-because the solver, CPLEX, is a black box to us.
-Although integer linear programming may be not good at 
-finding optimal sequences for area aggregation,
-it is relatively easy to formulate problems as ILPs.
-As stated by \citet[p.~861]{Cormen2009}, 
-``an efficient algorithm designed specifically for a problem 
-will often be more efficient than 
-linear programming both in theory and in practice. 
-The real power of linear programming comes from 
-the ability to solve new problems.''
-
-We may improve both the \Astar algorithm and the ILP-based 
-algorithm by integrating the greedy algorithm.
-The idea is that we use the greedy algorithm to find 
-a solution. 
-Then we can use the cost of the solution as an upper bound to 
-prune the branches of \Astar and the ILP. 
-Once we see that
-the cost of a branch is larger than the upper bound,
-we can ignore that branch  
-because it will not yield an optimal solution.
-
-
-
-In cartography, there are many more requirements 
-for area aggregation.
-For example, one requirement is 
-to keep important land-cover areas for a longer time
-(such as a settlement surrounded by farmlands).
-This requirement can be achieved by incorporating the idea of
-\textcite{Dilo2009tGAP}.
-They gave each type a weight, 
-then defined the importance of a patch 
-by the product of the area size and the type weight.
-While in our method, we used only the area size as importance.
-%
-Another requirement is that 
-aggregating two areas may result in 
-an area with a generalized type,
-as did by \textcite{vanSmaalen2003}. 
-For example, aggregating 
-\emph{farmland} with \emph{hedge} 
-yields an area with type \emph{vegetation}.
-%
-These issues can be considered in our future work.
-%
-
-
-
-
-
-\begin{acks}
-We thank Thomas C. van Dijk, Joachim Spoerhase, 
-and Sabine Storandt for their valuable suggestions.
-We thank Martijn Meijers for 
-prereviewing an earlier version of this paper.
-\end{acks}
-
-
-\printbibliography
-
 
 \end{document}
