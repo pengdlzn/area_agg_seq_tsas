@@ -105,7 +105,7 @@ within a given time frame.
 
 \keywords{Continuous map generalization, Land cover, 
 	 Type change, Compactness, Shortest path
-%	 , Optimization, Exponential
+%	 , Optimization, Exponential, NP-hard
 	 }
 
 \maketitle
@@ -229,7 +229,7 @@ when aggregating land-cover areas.
 Their inputs and generalized results together
 can be used as our inputs.
 However, we should not use those algorithms
-to generate a sequence of maps at different scales, 
+to generate a sequence of maps at different scales
 because those algorithms do not take into account 
 the consistence of the generated maps.
 We term the areas of the goal map \emph{regions}.
@@ -315,7 +315,7 @@ which are more complex and slower.
 Our case study 
 uses a dataset of the German topographic database ATKIS 
 (\sect\ref{sec:AreaAgg_CaseStudy}).
-In the conclusions, we show possible ways to improve our 
+In the concluding remarks, we show possible ways to improve our 
 methods (\sect\ref{sec:AreaAgg_Conclusions}). 
 
 We do not deal with simplifying polylines in this paper.
@@ -596,7 +596,7 @@ with respect to the order of the smallest patches
 (see for example \fig\ref{fig:AreaAgg_IntegrateSequence}).
 This integration is similar to the merge step in the 
 Mergesort algorithm; 
-see \textcite[pp.~29--37]{Cormen2009}.
+see \textcite[\sect2.3]{Cormen2009}.
 To allow us to describe our method more easily,
 below we assume that the goal map has only one region.
 This region consists of~$n$ land-cover 
@@ -637,8 +637,8 @@ We term a sequence of changes
 that adheres to our smallest-first requirement simply 
 an \emph{aggregation sequence}.
 
-
-\mypar{Model}
+\subsection{Model}
+\label{sec:AreaAgg_Model}
 We consider a directed graph $G_\mathrm{S}$, 
 which we call the \emph{subdivision graph} 
 (see \fig\ref{fig:AreaAgg_SubdivisionName}). 
@@ -656,7 +656,6 @@ On this basis, any directed path in~$G_\mathrm{S}$
 from the start map to the goal map
 defines a possible aggregation sequence.
 
-
 \begin{figure}[tb]
 \centering
 \includegraphics[page=3]{AreaAgg_Preliminaries}
@@ -670,53 +669,11 @@ defines a possible aggregation sequence.
 \end{figure}
 
 
-\mypar{Exponential lower bound}
-We now analyze the size of subdivision graph~$G_\mathrm{S}$.
-Our analysis is inspired by \textcite{Keane1975Size},
-where we use a row of~$n$ land-cover areas.
-In our instance
-(see \fig\ref{fig:AreaAgg_ExponentialSize}), 
-the start map consists of~$n=2k+1$ rectangles,
-and the goal map is simply the union of the~$n$ rectangles.
-At layer~$L_{k+1}$, we need to remove~$k$ of the~$2k$ 
-intermediate vertical boundaries. 
-For this, the number of choices is~$
-\binom{2k}{k}
-= \frac{2k\cdot (2k-1)\cdot \ldots \cdot (k+1)}
-{k\cdot (k-1)\cdot \ldots \cdot 1}
-\ge 2^k = 2^{(n-1)/2}$.
-That is to say, the size of our model
-has exponential lower bound.
+\subsection{Notation}
+\label{sec:AreaAgg_Notation}
 
-
-
-\mypar{Methods}
-Our idea is to obtain an optimal aggregation sequence through 
-computing a minimum-weight path from the start to the goal 
-(see \fig\ref{fig:AreaAgg_SubdivisionName}).
-This idea obviously requires that the arc weights are 
-set such that a minimum-weight start--goal
-path does actually correspond to an aggregation sequence of 
-maximum cartographic quality.  
-Moreover, putting the idea to practice is far from trivial 
-since graph~$G_\mathrm{S}$ can be huge.
-We compare a greedy algorithm, \Astar, and an ILP-based algorithm
-in finding such paths.
-Note that our inputs are only
-subdivisions~$\Pstart$ and~$\Pgoal$.
-We generate a subdivision (node) only when we want to visit it.
-
-In directed acyclic graphs, shortest paths can be found slightly faster 
-than in general directed or undirected graphs.
-An off-the-shelf shortest-path algorithm for directed acyclic graphs,
-however, will explore the whole graph, which has exponential size.
-The challenge in our work was to tune the A* algorithm such that it
-explores only a small fraction of the graph.
-
-
-\mypar{Notation}
 We represent each land-cover area by a polygon with a type.
-We denote by $P$ the set of polygons on the start map.
+We denote by~$P$ the set of polygons on the start map.
 We use~$p$, $q$, $r$, or~$o$ to denote polygons.
 A \emph{patch} is a set of polygons whose union is connected. 
 Each patch also has a unique land-cover area type.
@@ -735,11 +692,13 @@ where layer~${L}_t=\{{P}_{t,1},\dots,{P}_{t,n_t}\}$
 contains every possible subdivision~\Pnode\ with~$n-t+1$ patches 
 (see \fig\ref{fig:AreaAgg_ExponentialSize}).
 
+
 \begin{figure}[tb]
 \centering
 \includegraphics[page=4]{AreaAgg_Preliminaries}
-\caption{An example to show that the size of our problem 
-	has an exponential lower bound.}
+\caption{An example to show that 
+    the size of subdivision graph~$G_\mathrm{S}$
+	has exponential lower bound.}
 \label{fig:AreaAgg_ExponentialSize}
 \end{figure}
 
@@ -760,6 +719,69 @@ we call such a graph $G_\mathrm{A}$
 }
 \label{fig:AreaAgg_Variables_Graph}
 \end{figure} 
+
+
+
+
+
+\subsection{Exponential lower bound}
+\label{sec:AreaAgg_Exponential}
+We now analyze the size of subdivision graph~$G_\mathrm{S}$.
+Our analysis is inspired by \textcite{Keane1975Size},
+where we use a row of~$n$ land-cover areas.
+In our instance
+(see \fig\ref{fig:AreaAgg_ExponentialSize}), 
+the start map consists of~$n=2k+1$ rectangular patches,
+and the goal map is simply the union of the~$n$ patches.
+The patches have area 
+sizes~$
+%\left( 
+100 + \frac{1}{n}, 99+ \frac{2}{n}, 
+100 + \frac{3}{n}, 99+ \frac{4}{n}, \ldots, 
+99 + \frac{n-1}{n}, \text{and~} 101 
+%\right)
+$, 
+from left to right.
+According to our rule, we always 
+aggregate the smallest patch with one of its neighbors.
+Therefore, in the first~$k$ steps from the start map,
+we aggregate every other patch with one of its neighbors.
+At each of the steps, we have two choices,
+aggregating with the left patch or with the right one.
+As a result, there are~$2^k = 2^{(n-1)/2}$ subdivisions 
+in layer~$L_{k+1}$.
+That is to say, the size of subdivision graph~$G_\mathrm{S}$
+has exponential lower bound.
+
+
+\subsection{Methods}
+\label{sec:AreaAgg_Methods}
+
+Our idea is to obtain an optimal aggregation sequence through 
+computing a minimum-weight path from the start to the goal 
+(see \fig\ref{fig:AreaAgg_SubdivisionName}).
+This idea obviously requires that the arc weights are 
+set such that a minimum-weight start--goal
+path does actually correspond to an aggregation sequence of 
+maximum cartographic quality.  
+Moreover, putting the idea to practice is far from trivial 
+since graph~$G_\mathrm{S}$ can be huge.
+We compare a greedy algorithm, \Astar, and an ILP-based algorithm
+in finding such paths.
+Note that our inputs are only
+subdivisions~$\Pstart$ and~$\Pgoal$.
+We generate a subdivision (node) only when we want to visit it.
+
+In directed acyclic graphs, shortest paths can be found slightly faster 
+than in general directed or undirected graphs.
+An off-the-shelf shortest-path algorithm for directed acyclic graphs
+(e.g., \textcite[\sect25.2]{Cormen2009}),
+however, will explore the whole graph, which has exponential size.
+The challenge in our work was to tune the A* algorithm such that it
+explores only a small fraction of the graph.
+
+
+
 
 
 
