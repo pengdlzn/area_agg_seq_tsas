@@ -91,7 +91,7 @@ backrefstyle=three, %Compress three or more consecutive pages
 maxbibnames=9, %the author names appearing in bibliography
 maxcitenames=2, %the author names appearing in text
 giveninits=true,
-terseinits=true,%remove periods after initials of first names
+%terseinits=true,%remove periods after initials of first names
 isbn=false,
 %doi=false,url=false,
 eprint=false,
@@ -102,6 +102,9 @@ style=ACM-Reference-Format,
 language=american,
 abbreviate=true, dateabbrev=true,
 ]{biblatex}
+
+\addbibresource{Reference/BibReference.bib}
+
 
 %if a reference has doi, then we print only doi in bibliography;
 %otherwise, we print only url
@@ -123,7 +126,6 @@ abbreviate=true, dateabbrev=true,
 
 
 
-\addbibresource{Reference/BibReference.bib}
 
 %remove the information we don't want to present
 \AtEveryBibitem{% Clean up the bibtex rather than editing it
@@ -151,7 +153,6 @@ abbreviate=true, dateabbrev=true,
 %%\renewcommand{\labelnamepunct}{\addspace} %remove the punctuation after the year in bibliography
 %\renewcommand{\finentrypunct}{} %remove the full stop at the end of each
 %%bibliography entry
-%\addbibresource{Reference/BibReference.bib}
 %%\fi
 %
 %%\iffalse
@@ -368,12 +369,6 @@ abbreviate=true, dateabbrev=true,
 %\newcolumntype{x}[1]{>{\centering\arraybackslash\hspace{0pt}}p{#1}}
 
 
-%https://tex.stackexchange.com/questions/68308/how-to-add-running-title-and-author
-\usepackage{fancyhdr} %for command \lhead{}, \fancyhead
-
-%\usepackage{setspace}
-
-\usepackage{hyperref}
 
 %make package refcheck compatible with package hyperref 
 \makeatletter

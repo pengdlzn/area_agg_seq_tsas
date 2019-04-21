@@ -2,12 +2,14 @@
 \input{area_agg_seq_tsas_setting}
 
 
-\fancyhead[LO]{Finding Optimal Sequences for Area Aggregation}
-
 \begin{document}
-\title{Finding Optimal Sequences for Area Aggregation---\protect\\ 
-	\Astar vs. Integer Linear Programming
-    }
+\title
+[Finding Optimal Sequences for Area Aggregation] %short title
+{Finding Optimal Sequences for Area Aggregation---\texorpdfstring
+    {\protect\\ \Astar vs.\ Integer Linear Programming} %title of the paper
+    {A* vs.\ Integer Linear Programming} %title of the pdf
+}
+    
 %\titlenote{Produces the permission block, and
 %  copyright information}
 %\subtitle{Extended Abstract}
@@ -163,8 +165,11 @@ However, the term is also used when
 the discrete changes are small enough not to be noticed as,
 e.g., \textcite{Suba2016Road} state.
 We believe that digital maps will eventually 
-achieve smooth changes for zooming,
-and CMG is an effective way to realize smooth changes.
+achieve smooth changes for zooming.
+A simple way is to fade in and fade out raster maps
+as did by \textcite{Pantazis2009b}.
+However, we would like to carry out the changes in a more elegant way;
+we would like to change map features gradually.
 
 
 
@@ -180,6 +185,7 @@ with good visual experience during zooming operations,
 we propose to remove these tiny areas.
 We plan to achieve this goal by 
 aggregating them into neighboring land-cover areas.
+
 A \emph{land-cover map} is a planar subdivision in which 
 each area belongs to a land-cover class or \emph{type}.
 Suppose that there are two land-cover maps of different scales 
@@ -231,7 +237,10 @@ can be used as our inputs.
 However, we should not use those algorithms
 to generate a sequence of maps at different scales
 because those algorithms do not take into account 
-the consistence of the generated maps.
+the consistence between the generated maps.
+We use both a start map and a goal map instead of using only the start map
+because our generated maps at intermediate scales should be able to
+benefit from a goal map with high quality.
 We term the areas of the goal map \emph{regions}.
 That is, every region is the union of a set of areas 
 on the start map.
@@ -252,7 +261,7 @@ they do not produce a sequence land-cover maps.
 
 In this paper, we try to find an optimal sequence
 to aggregate the land-cover areas on the start map
-one by one until we arrive the goal map.
+one by one until we arrive at the goal map.
 We first independently deal with each region of the goal map 
 (with its components on the start map).
 Once we have found an aggregation sequence for each region, 
@@ -464,14 +473,25 @@ not only because it finds optimal solutions,
 but also because it helps us to evaluate the quality of a model
 \parencite{Haunert2017Label,
 Haunert2008Assuring,Haunert2016Optimization}.
-Recall that we wish to minimize the changes of types
-when aggregating areas one by one.
-A model could be to minimize 
+When we wish to minimize the changes of types
+in aggregating areas one by one,
+a model could be to minimize 
 the \emph{greatest} change over all the steps.
-Using optimization, we are able to find optimal solutions
-of this model at least for small instances.
-If even the optimal solutions are bad,
-then the model may be not reasonable.
+Using a greedy algorithm,
+we can minimize the change at each step,
+but the result does not necessarily minimize the greatest change
+over all the steps.
+If a result is bad,
+we cannot tell if the bad result comes from the model 
+or from the greedy algorithm.
+Using optimization,
+we are able to find optimal solutions
+of the model at least for small instances.
+If even an optimal solution is bad,
+then we can exclude that the bad result 
+is from the greedy algorithm.
+That is to say,
+the bad result is because of the model.
 In this case, we should improve the model; 
 we may want to minimize 
 the \emph{average} change over all the steps.
@@ -620,7 +640,8 @@ If the union uses the type of~$u$,
 we say that area~$v$ is \emph{aggregated into} area~$u$, 
 and vice versa. 
 How to aggregate exactly is decided by 
-optimizing a global cost function.
+optimizing a global cost function
+(see \sect\ref{sec:AreaAgg_CostFunctions}).
 This requirement ensures that the 
 size of the smallest area on the map increases in each step.
 Hence, the sequence reflects a gradual reduction of the 
@@ -676,7 +697,7 @@ We represent each land-cover area by a polygon with a type.
 We denote by~$P$ the set of polygons on the start map.
 We use~$p$, $q$, $r$, or~$o$ to denote polygons.
 A \emph{patch} is a set of polygons whose union is connected. 
-Each patch also has a unique land-cover area type.
+Each patch also has a unique land-cover type.
 We use~$u$ or~$v$ to denote the patches.
 
 Recall that we are dealing with a single region and 
@@ -746,7 +767,10 @@ According to our rule, we always
 aggregate the smallest patch with one of its neighbors.
 Therefore, in the first~$k$ steps from the start map,
 we aggregate every other patch with one of its neighbors.
-At each of the steps, we have two choices,
+However, we do not know which one is the right choice
+at each of the steps,
+in order to minimize our costs (see \sect\ref{sec:AreaAgg_CostFunctions}).
+We have to try both of the two choices,
 aggregating with the left patch or with the right one.
 As a result, there are~$2^k = 2^{(n-1)/2}$ subdivisions 
 in layer~$L_{k+1}$.
@@ -775,13 +799,11 @@ We generate a subdivision (node) only when we want to visit it.
 In directed acyclic graphs, shortest paths can be found slightly faster 
 than in general directed or undirected graphs.
 An off-the-shelf shortest-path algorithm for directed acyclic graphs
+%\parencite[e.g.,][\sect25.2]{Cormen2009},
 (e.g., \textcite[\sect25.2]{Cormen2009}),
 however, will explore the whole graph, which has exponential size.
 The challenge in our work was to tune the A* algorithm such that it
 explores only a small fraction of the graph.
-
-
-
 
 
 
@@ -838,9 +860,6 @@ which are as \emph{compact} as possible.
 Our argument is that an area is easier 
 to be identified by a human being 
 if it is more compact (less clutter).
-In this paper, we ignore the fact that
-some features may inherently take linear forms
-(e.g., rivers).
 %
 We also consider the total \emph{length} 
 of the interior boundaries as an alternative compactness;
@@ -877,7 +896,8 @@ longer lines generally yield lower map readability.
 \centering
 \includegraphics[page=1]{AreaAgg_CostsAndEstimations}
 \caption{Aggregating land-cover areas 
-	according to different preferences.
+	according to different preferences
+    by \textcite{Cheng2006}.
 	Aggregating a small land-cover area into another one 
 	that isolates the area (b), 
 	that is the largest neighbor (c), 
@@ -901,17 +921,17 @@ We define the cost of type change of this step by
 \label{eq:f_type}
 f_\mathrm{type}(P_{s,i},P_{s+1,j})=\frac{A_{u}}{A_R}
 \cdot
-\frac{d(T(u),T(v))}{T_{\max}},
+\frac{d_\mathrm{type}(T(u),T(v))}{d_\mathrm{type\_max}},
 \end{equation}
 where~$A_u$ is the area of patch~$u$, 
 and~$A_R$ is the area of region~$R$
 (see \sect\ref{sec:AreaAgg_Preliminaries}).
-We use~$A_R$ and~$T_{\max}$ 
+We use~$A_R$ and~$d_\mathrm{type\_max}$ 
 to normalize the cost of type change. 
-Constant~$T_{\max}$, the maximum cost over all type changes,  
+Constant~$d_\mathrm{type\_max}$, the maximum cost over all type changes,  
 is known from the input. 
 The input specifies, for each pair~$(T_1,T_2)$ of types, 
-cost~$d(T_1,T_2)$ of changing type~$T_1$ to type~$T_2$.
+cost~$d_\mathrm{type}(T_1,T_2)$ of changing type~$T_1$ to type~$T_2$.
 Specifically, we denote by~$T_\mathrm{goal}$ the type of 
 the patch on the goal map.
 For simplicity, we use a metric 
@@ -1121,7 +1141,7 @@ connect each of them both with the black vertex for $u$
 and the black vertex for $v$
 (\fig\ref{fig:AreaAgg_Reduction}b).
 
-\begin{figure}[h]
+\begin{figure}[tb]
 \centering
 \includegraphics[page=1]{AreaAgg_NPHard}
 \caption{The reduction for our NP-hardness proof.
@@ -1201,7 +1221,7 @@ to black vertices
 (the total cost increases by $2$ at least).
 Therefore, we have found a contradiction to our assumption.
 
-\begin{figure}[h]
+\begin{figure}[tb]
 \centering
 \includegraphics[page=2]{AreaAgg_NPHard}
 \caption{The situation after Phase I has been conducted 
@@ -1232,8 +1252,8 @@ we add one more rule to our greedy algorithm.
 Suppose that patch~$v$ is one of~$u$'s neighbors.
 The greedy algorithm aggregates~$u$ into~$v$ 
 if the type distances fulfill that
-$d\left(T(u), T_\mathrm{goal}\right) 
-\ge d\left(T(v), T_\mathrm{goal}\right)$;
+$d_\mathrm{type}\left(T(u), T_\mathrm{goal}\right) 
+\ge d_\mathrm{type}\left(T(v), T_\mathrm{goal}\right)$;
 otherwise, the algorithm aggregates~$v$ into~$u$.
 This rule excludes, say,~$k_e$ aggregation choices,
 and we have~$2k_u - k_e$ choices left.
@@ -1606,7 +1626,7 @@ h_\mathrm{lgth}(\Pnode)=
 \end{equation}
 
 
-\begin{figure*}[htb]
+\begin{figure*}[tb]
 \centering
 \includegraphics[page=5]{AreaAgg_CostsAndEstimations}
 \caption{An "aggregation sequence" for computing 
@@ -1616,7 +1636,7 @@ h_\mathrm{lgth}(\Pnode)=
 	At each step, we keep the necessary number 
 	of interior boundaries with least lengths in order to find a 
 	lower bound of the total length of the interior boundaries, 
-	i.e., $l_\mathrm{int}(P_{s,i'''_s})$.
+	i.e., $\ell_\mathrm{int}(P_{s,i'''_s})$.
 	The numbers represent the 
 	lengths of the interior boundaries.
     Note that this aggregation sequence is impossible in reality,
@@ -1731,7 +1751,7 @@ to type \emph{fence} is~$2$,
 to type \emph{street} is~$4$, and
 to type \emph{farm land} is~$6$.
 In this tree, the maximum distance is~$6$, 
-which means~$T_\mathrm{max}=6$ for \eq\ref{eq:f_type}.
+which means~$d_\mathrm{type\_max}=6$ for \eq\ref{eq:f_type}.
 According to \citet{Rada1989SemanticMetric}, 
 the resulting cost function for type change is a metric.
 
@@ -2003,7 +2023,7 @@ In this case, the smallest patch has type~$5112$, and the
 surrounding one has~$2112$.
 The type of the goal patch is~$4102$.
 According to \fig\ref{fig:AreaAgg_TypeDistances},
-type distances~$d(5112,4102)=4$ and~$d(2112,4102)=6$.
+type distances~$d_\mathrm{type}(5112,4102)=4$ and~$d_\mathrm{type}(2112,4102)=6$.
 As a result, our greedy algorithm uses~$5112$ 
 as the type for the new patch. 
 This choice is a big mistake 
@@ -2067,7 +2087,7 @@ is shown in \fig\ref{fig:AreaAgg_CaseStudy1_Rg53}.
     the type of the largest polygon on the start map 
     changed only once, which is good; 
     while the type of the largest polygon changed twice 
-    in the sequence obtained by the Greedy algorithm.}
+    in the sequence obtained by the greedy algorithm.}
 \label{fig:AreaAgg_CaseStudy1_Rg85}
 \end{figure}
 
@@ -2111,7 +2131,7 @@ is shown in \fig\ref{fig:AreaAgg_CaseStudy1_Rg53}.
 %	result, we needed to overestimate (with factor~$K=8$).}
 
 
-
+\clearpage
 
 \subsection{Using costs of type change and length}
 \label{sec:AreaAgg_CaseStudy2}
@@ -2359,6 +2379,8 @@ if their common boundary is too short.
 
 %\todo{chart: memory use of greedy, A*, and ILP}
 
+%\clearpage
+
 \section{Concluding Remarks}
 \label{sec:AreaAgg_Conclusions}
 In this paper, we investigated the problem of 
@@ -2491,6 +2513,10 @@ For example, aggregating
 \emph{farmland} with \emph{hedge} 
 yields an area with type \emph{vegetation}.
 %
+In our setting, we ignored the fact that
+some features may inherently take linear forms
+(e.g., rivers).
+%
 These issues can be considered in our future work.
 %
 
@@ -2507,6 +2533,8 @@ prereviewing an earlier version of this paper.
 
 
 \printbibliography
+
+\clearpage
 
 \appendix
 \section{Formulation of Integer Linear Programming}
@@ -2844,7 +2872,7 @@ we compute the total cost of type change by
 \embrd[V]{F_\mathrm{type}} =
 \sum_{t=2}^{n} \sum_{p\in P} \sum_{o\in P} \sum_{r\in P}
 \left(\frac{a_p}{A_R} \cdot
-\frac{d(T(o),T(r))}{T_{\max}}\cdot 
+\frac{d_\mathrm{type}\left(T(o),T(r)\right)}{d_\mathrm{type\_max}}\cdot 
 y_{t,p,o,r}\right), & 
 \end{flalign*}
 where, similar to \eq\ref{eq:f_type}, 
@@ -2871,7 +2899,7 @@ of all the intermediate subdivisions by
 \frac{1}{n-2} \sum_{t=2}^{n-1} 
 \frac{\sum_{b\in B (\Pstart)} |b| - 
 	\frac{1}{2} \sum_{p \in P}\sum_{q \in P}\sum_{r \in P} 
-	\big(|b_{pq}|\cdot z_{t,p,q,r}\big)} {D(t)}, &
+	\left(|b_{pq}|\cdot z_{t,p,q,r}\right)} {D(t)}, &
 \end{flalign}
 where variable~$b_{pq}$ represents the common boundary 
 between polygons~$p$ and~$q$. 
@@ -2893,7 +2921,7 @@ into \eq\ref{eq:F_length_raw}, we have
 \left(
 \frac{1}{n-t} -
 \frac{\sum_{p \in P}\sum_{q \in P}\sum_{r \in P} 
-	\big(|b_{pq}|\cdot z_{t,p,q,r}\big)}
+	\left(|b_{pq}|\cdot z_{t,p,q,r}\right)}
 {2(n-t)\sum_{b\in B (\Pstart)} |b| }
 \right). &
 \end{flalign*}
