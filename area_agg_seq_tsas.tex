@@ -146,7 +146,8 @@ a map must be changed to provide information
 appropriate to the corresponding zoom level.
 However, large discrete changes may distract users.
 The \emph{on-the-fly generalization}~\parencite{Weibel2017Fly},
-which generalizes features in real time, can mitigate this problem.
+which generalizes map features (e.g., polyglines and polygons) 
+in real time, can mitigate this problem.
 Still, large discrete changes can be introduced.
 By a usability test, \textcite{Midtbo2007} have shown that 
 a map is easier to follow 
@@ -164,13 +165,25 @@ Ideally, there should be no discrete change in CMG.
 However, the term is also used when 
 the discrete changes are small enough not to be noticed as,
 e.g., \textcite{Suba2016Road} state.
-We believe that digital maps will eventually 
-achieve smooth changes for zooming.
-A simple way is to fade in and fade out raster maps
-as did by \textcite{Pantazis2009b}.
-However, we would like to carry out the changes in a more elegant way;
-we would like to change map features gradually.
 
+We consider CMG as the process of producing maps 
+covering a continuous interval of scales,
+where CMG considers constraints and quality measures 
+that act across different scales. 
+In our work, for example, the quality of an aggregation sequence 
+is measured as a whole; 
+whereas in classical generalization approaches, 
+only the quality of a map at some output scale is measured.
+We consider CMG possible, desirable, and realistic.
+In CMG, it is not necessary that 
+all changes that occur during zooming are animated in a continuous fashion. 
+That fashion may generally be possible. 
+A simple way is to fade in and fade out raster maps
+as did by \textcite{Pantazis2009b}, 
+but it is not at all clear 
+whether such animations would improve the experience of the map user.
+By contrast, we would like to carry out the changes in a more elegant way;
+we would like to change map features gradually.
 
 
 
@@ -255,9 +268,17 @@ with an automatic method for area aggregation,
 for example, by the method of \citet{HaunertWolff2010AreaAgg}.
 That method produces a land-cover map at a single smaller scale, 
 given a land-cover map at a larger scale.
-Although \textcite{HaunertWolff2010AreaAgg}
+Note that although \textcite{HaunertWolff2010AreaAgg}
 attain results of high quality, 
 they do not produce a sequence land-cover maps.
+
+Our method can also be extended to find an aggregation sequence 
+for two maps (a start map and a goal map) that are from different sources.
+In that case, one could compute a map overlay of the two maps
+and use the result 
+(with combined boundaries from both input maps and land cover classes 
+from the given large-scale map) 
+as the start map.
 
 In this paper, we try to find an optimal sequence
 to aggregate the land-cover areas on the start map
@@ -318,9 +339,8 @@ but in general, it is NP-hard
 to solve an ILP optimally.
 By comparing with the greedy algorithm, 
 which is used as a benchmark,
-we are able to see whether it is worth 
-to use \Astar or the ILP-based algorithm, 
-which are more complex and slower.  
+we are able to see whether \Astar or the ILP-based algorithm, 
+which are more complex and slower, indeed perform better.  
 Our case study 
 uses a dataset of the German topographic database ATKIS 
 (\sect\ref{sec:AreaAgg_CaseStudy}).
@@ -991,7 +1011,7 @@ Recalling that there are~$n-s+1$ patches at time~$s$,
 we define the cost of compactness for subdivision~\Psnode as
 \begin{equation}
 \label{eq:f_comp}
-f_{\mathrm{comp}}(\Psnode)=
+f_\mathrm{comp}(\Psnode)=
 \frac{1-\frac{1}{n-s+1} \sum_{c\in C(\Psnode)}c}{n-2},
 \end{equation}
 where we use values~$n-s+1$ and~$n-2$ to normalize 
@@ -1018,7 +1038,7 @@ The cost in terms of interior length of
 this subdivision is defined as
 \begin{equation}
 \label{eq:f_length}
-f_{\mathrm{lgth}}(\Psnode)=
+f_\mathrm{lgth}(\Psnode)=
 \frac{\big(\sum_{b\in B (\Psnode)} 
 	|b|\big)\big/D(s)}{n-2}, 
 \end{equation} 
@@ -1048,6 +1068,23 @@ and the last subdivision in the path) by
 g_\mathrm{lgth}(\Pistar)=
 \sum_{s=2}^{\tstar-1}f_{\mathrm{lgth}}(P_{s,i_s}).
 \end{equation}
+
+Note that in theory, a patch, $u$, with a small perimeter 
+can be extremely non-compact 
+according to measure~$c(u)$ in \eq\ref{eq:comp}, 
+thus the two measures, $f_\mathrm{comp}$ and~$f_\mathrm{lgth}$, 
+are not interchangeable. 
+However, if we assume that all areas of the map have the same size 
+(i.e., $A_u$ of \eq\ref{eq:comp} is a constant), 
+it would make no difference whether 
+we minimize an area's perimeter 
+or maximize the area's compactness~$c(u)$. 
+Obviously, the areas in our dataset have different sizes. 
+However, since we iteratively remove the smallest area, 
+the differences do not become too large. 
+Therefore, measuring the overall compactness of a map 
+based on the total length of all the interior boundaries is quite reasonable.
+
 
 \subsection{Combining cost functions}
 \label{sec:AreaAgg_Combining}
@@ -1236,6 +1273,18 @@ Therefore, we have found a contradiction to our assumption.
 \label{sec:AreaAgg_Greedy}
 
 
+A motivation for the greedy algorithm is that 
+a very similar iterative algorithm has been used by
+\textcite{vanOosterom1995Development} 
+for constructing the tGAP data structure.
+However, we have to make minor modifications to ensure that 
+the computed aggregation sequence ends with the goal map that, 
+in our situation, is given as a part of the input.
+We use our greedy algorithm as a benchmark
+so that we are able to see 
+whether the \Astar algorithm or the ILP-based algorithm 
+indeed perform better.
+
 At any time~$t$,
 our greedy algorithm aggregates the smallest patch
 with one of its neighbors.
@@ -1287,9 +1336,6 @@ according to \eqs\ref{eq:f_1} or~\ref{eq:f_2}
 in our two experiments.
 The cost of a whole sequence can be computed by
 \eqs\ref{eq:g_1} or~\ref{eq:g_2}.
-
-
-
 
 
 

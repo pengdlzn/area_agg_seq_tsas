@@ -7,6 +7,7 @@
 
 \usepackage[defaultlines=4,all]{nowidow}%forbid widow or orphan
 
+
 % Hack to try to make acmart work with biblatex: 
 %https://tex.stackexchange.com/questions/37076/is-it-possible-to-load-biblatex-with-a-class-that-has-already-loaded-natbib
 %\let\citename\relax
@@ -118,3 +119,6 @@ bookmarksopen=true,bookmarksnumbered=true]{hyperref}
 \newcommand{\sects}{Sections~}
 \newcommand{\tabs}{Tables~}
 \newcommand{\chaps}{Chapters~}
+
+
+\renewcommand{\labelitemi}{\textendash}

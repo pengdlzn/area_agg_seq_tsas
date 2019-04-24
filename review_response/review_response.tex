@@ -29,10 +29,19 @@
 \tableofcontents
 
 \begin{abstract}
-	We thank the anonymous reviewers for their comments.
-    These comments are very useful for us to improve our paper. 
-    Below, we address every comment carefully and 
-    explain the corresponding changes in the manuscript.
+We thank the anonymous reviewers for their comments.
+These comments were very helpful for us to improve our paper. 
+In this document, 
+we provide detailed responses to each of the reviewers' comments. 
+The following list summarizes our most important changes:
+\begin{itemize}
+    \item  An NP-hardness proof has been added.
+    \item  The illustration of the exponential lower bound has been improved.
+    \item  The approach based on integer linear programming 
+    has been moved to the appendix.
+    \item  Several comments concerning the applied compactness measures 
+    have been incorporated.
+\end{itemize}
 \end{abstract}
 
 \section{Reviewer 1}
@@ -76,18 +85,21 @@ or something like that).
 (Assuming you have the data/solutions, this would be comparatively easy to do?)
 }
 
-\textbf{Response} 
-To the best of our knowledge, 
-there is no literature describing 
-the correlation between the two models for compactness.
-\textcite{Li2013Compactness} reviewed some measures for compactness.
+\textbf{Response}
+In theory, a patch, $u$, with a small perimeter can be extremely non-compact according to measure~$c(u)$ in \eq3, thus the two measures that we consider are not interchangeable. However, if we assume that all areas of the map have the same size (i.e., $A_u$ is a constant), it would make no difference whether we minimize an area's perimeter or maximize the area's compactness~$c(u)$. Obviously, the areas in our data set have different sizes. However, since we iteratively remove the smallest area, the differences do not become too large. Therefore, measuring the overall compactness of a map based on the total length of all the interior boundaries is quite reasonable.
+We have added this argument into Section~4.3 (Cost of Length).
 
-This comment will lead to an interesting research.
-Of course, it is easy to compute the~$g_1$ value of the result of~\Astar-$g_2$,
-and vice versa, since we have the data.
-If we present the values, then it would be better to also theoretically analyze the correlation between the two compactness formulas,
-which could lead to a new paper.
-We may perform this research in our future work.
+%To the best of our knowledge, 
+%there is no literature describing 
+%the correlation between the two models for compactness.
+%\textcite{Li2013Compactness} reviewed some measures for compactness.
+%
+%This comment will lead to an interesting research.
+%Of course, it is easy to compute the~$g_1$ value of the result of~\Astar-$g_2$,
+%and vice versa, since we have the data.
+%If we present the values, then it would be better to also theoretically analyze the correlation between the two compactness formulas,
+%which could lead to a new paper.
+%We may perform this research in our future work.
 
 
 
@@ -101,18 +113,32 @@ Fig 18. describes a ``bad choice'' for the given greedy strategy,
 but I see no motivation/example of why it would be a good choice.
 }
 
-\textbf{Response} We have a start map and a goal map.
+\textbf{Response} 
+A motivation for our greedy algorithm is that 
+a very similar iterative algorithm has been used by
+\textcite{vanOosterom1995Development} 
+for constructing the tGAP data structure.
+However, we have to make minor modifications to ensure that 
+the computed aggregation sequence ends with the goal map that, 
+in our situation, is given as a part of the input.
+We use our greedy algorithm as a benchmark
+so that we are able to see 
+whether the \Astar algorithm or the ILP-based algorithm 
+indeed perform better.
+We have added this argument into Section 6 (A Greedy Algorithm).
+
+We have a start map and a goal map.
 Our greedy algorithm must ensure that 
 our final result (e.g., the polygon of layer $L_4$ in
 Figure 3) will have the type of $T_\mathrm{goal}$.
 This is why we should not always recolor the smallest region.
-We have added this argument in Section 6 (A Greedy Algorithm).
+We have added this argument into Section 6 (A Greedy Algorithm).
 
 We use a start map and a goal map because 
 our aggregation sequence should be able to 
 benefit from a goal map with high quality.
 We have added this argument 
-in ``Problem definition'' of Section 1 (Introduction).
+into ``Problem definition'' of Section 1 (Introduction).
 
 We have added more details 
 into the caption of Fig 18 (Fig 17 in the new version).
@@ -181,8 +207,25 @@ in terms of having no discrete changes,
 possible / desirable / realistic?
 }
 
-\textbf{Response} We believe that continuous generalization is possible,
-desirable, and realistic. 
+\textbf{Response} 
+We consider CMG as the process of producing maps 
+covering a continuous interval of scales,
+where CMG considers constraints and quality measures 
+that act across different scales. 
+In our work, for example, the quality of an aggregation sequence 
+is measured as a whole; 
+whereas in classical generalization approaches, 
+only the quality of a map at some output scale is measured.
+We consider CMG possible, desirable, and realistic.
+In CMG, it is not necessary that 
+all changes that occur during zooming are animated in a continuous fashion. 
+That fashion may generally be possible. 
+A simple way is to fade in and fade out raster maps
+as did by \textcite{Pantazis2009b}, 
+but it is not at all clear 
+whether such animations would improve the experience of the map user.
+By contrast, we would like to carry out the changes in a more elegant way;
+we would like to change map features gradually.
 We have added more arguments in Section 1 (Introduction).
 
 
@@ -190,8 +233,9 @@ We have added more arguments in Section 1 (Introduction).
 }
 
 \textbf{Response} Figure 5 shows some ideas of \textcite{Cheng2006}.
-It is fine options (b) and (c, d, e) cannot be applicable simultaneously.
-We present this figure to show some inspirations that we got from reading the paper.
+We agree with the reviewer that
+options (b) and (c, d, e) cannot be applicable simultaneously.
+Still, we think that the figure is useful to exemplify possible choices.
 We have added the reference of \textcite{Cheng2006} into the caption.
 
 
@@ -206,9 +250,16 @@ We have added this argument in Section 1 (Introduction).
 
 \rcomment{Fig. 24 -- the problem is attributed to the small shared boundary. But is this not ``simply'' an issue of compactness? (That is, the compactness is not weighted heavily enough / or not captured adequately?).
 }
-\textbf{Response} This is a good point of view.
-In order to make the reason clear, we will need to do more experiments.
-That can be our future work.
+\textbf{Response} 
+This is an interesting question.
+According to our experiences, 
+the weight factor that we applied defines a reasonable trade-off 
+between the different conflicting objectives, 
+when considering a solution as a whole. 
+However, we are far from claiming that 
+the applied weight factor has been optimally chosen. 
+This would probably require a user study, 
+which would be beyond the scope of our article.
 
 
 \rcomment{Can this approach also work if no target map is not given (or has no predefined type)?
@@ -252,6 +303,9 @@ We have added a section to show that our problem is NP-Hard;
 see Section 5 (NP-Hardness Proof).
 No literature has tried to solve this problem.
 
+If the two maps come from different sources, one could compute a map overlay and use the result (with combined boundaries from both input maps and land cover classes from the given large-scale map) as the start map.
+We have added this argument into ``Problem definition''
+of Section 1 (Introduction).
 
 
 \rcomment{In ``A model could be to minimize the smallest change over all the steps'' (page 3) doesn't sound right. Do you mean to minimize ``greatest'' change? I may overlook something, though.
@@ -369,7 +423,7 @@ This is why we define~$g_\mathrm{type}$ and~$g_\mathrm{comp}$.
 We also want to compare the \Astar and a method based on integer linear programming
 in solving our problem, while $g_\mathrm{comp}$ cannot be computed linearly.
 So we combine~$g_\mathrm{type}$ and~$g_\mathrm{lgth}$ when we make the comparison.
-We have made this more clearly in Section~4.4 (Combining Cost Functions). 
+We have made this more clear in Section~4.4 (Combining Cost Functions). 
 
 
 \rcomment{
@@ -482,8 +536,8 @@ while our method deals with \emph{continuous} map generalization.
 Even the results of the \Astar algorithm are only slightly better
 than that of the greedy algorithm, 
 it is still worth to use the results of the \Astar algorithm.
-We can save the results obtained by the \Astar algorithm on a server,
-when users are zooming on a map, we can simply send the precomputed results.
+We can save the results obtained by the \Astar algorithm on a server.
+When users are zooming on a map, we can simply send the precomputed results.
 
 It is true that whether the final results are pleasing to the eye or not 
 is also dependent on the choice of the cost, 
