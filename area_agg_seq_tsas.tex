@@ -1933,7 +1933,7 @@ we cannot verify that only from the cost values.
 \begin{tabular}{lRRRCCCCCd{3.7}}
 \toprule
 \multicolumn{1}{l}{Methods} &
-\multicolumn{1}{l}{\#OS} &
+\multicolumn{1}{c}{\#OS} &
 \multicolumn{1}{c}{\#FS} &
 \multicolumn{1}{r}{$k_\mathrm{sum}$} &  
 \multicolumn{1}{c}{\#nodes} & 
@@ -2244,7 +2244,7 @@ the total cost of the solutions by the greedy algorithm.
 \begin{tabular}{lRRRCCCCCd{3.7}}
 \toprule
 \multicolumn{1}{l}{Methods} &
-\multicolumn{1}{l}{\#OS} &
+\multicolumn{1}{c}{\#OS} &
 \multicolumn{1}{c}{\#FS} &
 \multicolumn{1}{r}{$k_\mathrm{sum}$} &  
 \multicolumn{1}{c}{\#nodes} & 
@@ -2395,7 +2395,7 @@ Using cost function~$g_2$, we had a similar problem.
 The subdivision with~$7$ patches is such an example,
 where we expect the result of 
 \fig\ref{fig:AreaAgg_CaseStudy2_Rg358}c.
-In an earlier version of this paper \parencite{Peng2017AStar},
+In an earlier version of this paper \parencite[see][]{Peng2017AStar},
 we tried a combination of minimizing type changes 
 and maximizing the sum of the smallest compactness values, 
 over the whole sequence.
@@ -2404,6 +2404,18 @@ in \fig\ref{fig:AreaAgg_CaseStudy2_Rg358}b.
 This problem, however, can be fixed easily 
 by forbidding two patches to aggregate 
 if their common boundary is too short.
+Moreover, there are two more possible solutions.
+First, we could integrate the shared length
+into our cost function, as did by \textcite{vanOosterom1995Development}.
+Second, we could weight the cost of shape more heavily
+(i.e., increasing weight factor~$\lambda$ of \eqs\ref{eq:g_1} and~\ref{eq:g_2}).
+According to our experiences, 
+the weight factor that we applied defines a reasonable trade-off 
+between the different conflicting objectives, 
+when considering a solution as a whole. 
+However, we are far from claiming that 
+the applied weight factor has been optimally chosen. 
+This would probably require a user study.
 
 
 \begin{figure}[h!tb]
