@@ -813,7 +813,8 @@ since graph~$G_\mathrm{S}$ can be huge.
 We compare a greedy algorithm, \Astar, and an ILP-based algorithm
 in finding such paths.
 Note that our inputs are only
-subdivisions~$\Pstart$ and~$\Pgoal$.
+subdivisions~$\Pstart$ and~$\Pgoal$
+(see \fig\ref{fig:AreaAgg_SubdivisionName}).
 We generate a subdivision (node) only when we want to visit it.
 
 In directed acyclic graphs, shortest paths can be found slightly faster 
@@ -822,11 +823,21 @@ An off-the-shelf shortest-path algorithm for directed acyclic graphs
 %\parencite[e.g.,][\sect25.2]{Cormen2009},
 (e.g., \textcite[\sect25.2]{Cormen2009}),
 however, will explore the whole graph, which has exponential size.
+The \Astar algorithm can be seen as 
+a refinement of Dijkstra's algorithm, 
+which for a user-specified given source 
+computes shortest paths to all other nodes in an edge-weighted graph
+\parencite{Dijkstra1959}. 
+Even when using Dijkstra's algorithm 
+to compute only a single shortest path to a user-specified destination, 
+a large number of nodes need to be explored. 
+The same holds for shortest-path algorithms 
+that make use of a topological order of the nodes 
+in a directed acyclic graph. 
+Compared to these algorithms, 
+the \Astar algorithm can greatly reduce the number of explored nodes.
 The challenge in our work was to tune the A* algorithm such that it
 explores only a small fraction of the graph.
-
-
-
 
 
 \section{Cost Functions}
