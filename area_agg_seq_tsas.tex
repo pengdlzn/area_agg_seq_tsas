@@ -155,7 +155,7 @@ if the map extent transits smoothly than stepwise.
 In addition to smoothly transiting map extent, 
 we want to change also map features smoothly 
 when users are zooming.
-we believe that this strategy will allow users 
+We believe that this strategy will allow users 
 to follow maps even more easily.
 The process of producing maps at any different scales
 with smooth changes 
@@ -214,9 +214,9 @@ during zooming.
 
 \begin{figure}[tb]
 \centering
-\includegraphics{AreaAgg_example}
-\caption{The input and a possible output of an aggregation sequence 
-	for an instance of our problem}
+\includegraphics[page=1]{AreaAgg_Preliminaries}
+\caption{The input and a possible output for an instance of 
+our problem.}
 \label{fig:AreaAgg_example}
 \end{figure}
 
@@ -227,7 +227,7 @@ to obtain a less-detailed representation
 based on small incremental changes, 
 e.g., the Generalized Area Partitioning tree (GAP-tree).
 This tree can be constructed if only the larger-scale map is given
-\citep{vanOosterom1995Development} 
+\citep{vanOosterom2005} 
 or if both the larger-scale map and the smaller-scale map 
 are given \citep{HaunertDilo2009}.
 Typically, the next change in such a sequence 
@@ -254,6 +254,7 @@ the consistence between the generated maps.
 We use both a start map and a goal map instead of using only the start map
 because our generated maps at intermediate scales should be able to
 benefit from a goal map with high quality.
+
 We term the areas of the goal map \emph{regions}.
 That is, every region is the union of a set of areas 
 on the start map.
@@ -268,9 +269,9 @@ with an automatic method for area aggregation,
 for example, by the method of \citet{HaunertWolff2010AreaAgg}.
 That method produces a land-cover map at a single smaller scale, 
 given a land-cover map at a larger scale.
-Note that although \textcite{HaunertWolff2010AreaAgg}
+Although \textcite{HaunertWolff2010AreaAgg}
 attain results of high quality, 
-they do not produce a sequence land-cover maps.
+they do not produce a sequence of land-cover maps.
 
 Our method can also be extended to find an aggregation sequence 
 for two maps (a start map and a goal map) that are from different sources.
@@ -700,12 +701,12 @@ defines a possible aggregation sequence.
 \begin{figure}[tb]
 \centering
 \includegraphics[page=3]{AreaAgg_Preliminaries}
-\caption{The subdivision graph~$G_\mathrm{S}$. 
+\caption{The subdivision graph, $G_\mathrm{S}$. 
 	The nodes of the graph are the subdivisions. 
 	There is an arc	from subdivision~\Pnode 
 	to subdivision~${P}_{t+1,j}$ 
 	if~${P}_{t+1,j}$ is the result of 
-	an aggregating step from~\Pnode.}
+	an aggregation step from~\Pnode.}
 \label{fig:AreaAgg_SubdivisionName}
 \end{figure}
 
@@ -788,7 +789,7 @@ aggregate the smallest patch with one of its neighbors.
 Therefore, in the first~$k$ steps from the start map,
 we aggregate every other patch with one of its neighbors.
 However, we do not know which one is the right choice
-at each of the steps,
+at each of the steps
 in order to minimize our costs (see \sect\ref{sec:AreaAgg_CostFunctions}).
 We have to try both of the two choices,
 aggregating with the left patch or with the right one.
@@ -802,7 +803,7 @@ has exponential lower bound.
 \label{sec:AreaAgg_Methods}
 
 Our idea is to obtain an optimal aggregation sequence through 
-computing a minimum-weight path from the start to the goal 
+computing a path with minimum weight, from the start to the goal 
 (see \fig\ref{fig:AreaAgg_SubdivisionName}).
 This idea obviously requires that the arc weights are 
 set such that a minimum-weight start--goal
@@ -836,8 +837,8 @@ that make use of a topological order of the nodes
 in a directed acyclic graph. 
 Compared to these algorithms, 
 the \Astar algorithm can greatly reduce the number of explored nodes.
-The challenge in our work was to tune the A* algorithm such that it
-explores only a small fraction of the graph.
+The challenge in our work was to tune the \Astar algorithm such that 
+it explores only a small fraction of the graph.
 
 
 \section{Cost Functions}
@@ -961,15 +962,13 @@ We use~$A_R$ and~$d_\mathrm{type\_max}$
 to normalize the cost of type change. 
 Constant~$d_\mathrm{type\_max}$, the maximum cost over all type changes,  
 is known from the input. 
-The input specifies, for each pair~$(T_1,T_2)$ of types, 
+The input specifies
 cost~$d_\mathrm{type}(T_1,T_2)$ of changing type~$T_1$ to type~$T_2$.
 Specifically, we denote by~$T_\mathrm{goal}$ the type of 
 the patch on the goal map.
 For simplicity, we use a metric 
 as the cost function of type change
-(see \sect\ref{sec:AreaAgg_CaseStudy}); 
-\textcite[\chap2]{Choudhary1992Elements}
-shows the definition of a metric.
+(see \sect\ref{sec:AreaAgg_CaseStudy}).
 A metric distance is symmetric, 
 which is different from the asymmetric one used in
 \textcite{Dilo2009tGAP}.
@@ -1002,7 +1001,7 @@ g_\mathrm{type}(\Pistar)=
 \label{sec:AreaAgg_f_comp}
 
 We use the compactness definition of \citet{Frolov1975}, 
-i.e., the compactness value for a patch, say,~$u$ is
+i.e., the compactness value of a patch, say,~$u$ is
 \begin{equation}
 \label{eq:comp}
 c(u)=\frac{2 \sqrt{\pi A_u}}{l_u},
@@ -1010,9 +1009,9 @@ c(u)=\frac{2 \sqrt{\pi A_u}}{l_u},
 where~$A_u$ and~$l_u$ are 
 the area and the perimeter. 
 For a subdivision \Psnode, we denote by~$C(\Psnode)$ 
-the set of the patches' compactnesses.
+the set of the patches' compactness values.
 
-We wish to maximize the sum of the average compactnesses 
+We wish to maximize the sum of the average compactness values 
 over all intermediate maps,
 while our objective will be
 minimizing a cost function.
@@ -1194,7 +1193,7 @@ and the black vertex for $v$
 \includegraphics[page=1]{AreaAgg_NPHard}
 \caption{The reduction for our NP-hardness proof.
     The dashed polygon in (c) shows 
-    that the vertices are merged.}
+    the merged vertices.}
 \label{fig:AreaAgg_Reduction}
 \end{figure}
 
@@ -1286,7 +1285,7 @@ Therefore, we have found a contradiction to our assumption.
 
 A motivation for the greedy algorithm is that 
 a very similar iterative algorithm has been used by
-\textcite{vanOosterom1995Development} 
+\textcite{vanOosterom2005} 
 for constructing the tGAP data structure.
 However, we have to make minor modifications to ensure that 
 the computed aggregation sequence ends with the goal map that, 
@@ -1800,7 +1799,7 @@ the distance is the ``number of edges'' that
 we need to travel from one node to another node in the tree of 
 type hierarchy\footnote{More information 
     about land-cover types can be found at 
-%	\url{http://www.atkis.de/dstinfo/dstinfo2.dst_gliederung},
+	\url{http://www.atkis.de/dstinfo/dstinfo2.dst_gliederung},
 	Accessed: Nov 1, 2017.}
 (see \fig\ref{fig:AreaAgg_TypeDistances}). 
 For example, the distance from type \emph{village}
@@ -1864,7 +1863,8 @@ the resulting cost function for type change is a metric.
 \label{sec:AreaAgg_CaseStudy1}
 
 As illustrated in \sect\ref{sec:AreaAgg_Combining},
-we compare \Astar and the greedy algorithm using $g_1(\Pnode)$,
+we compare the \Astar algorithm and 
+the greedy algorithm using $g_1(\Pnode)$,
 which is a combination of the costs 
 of type change and compactness (see \eq\ref{eq:g_1}).
 For \Astar, we overestimated 
@@ -2417,7 +2417,7 @@ by forbidding two patches to aggregate
 if their common boundary is too short.
 Moreover, there are two more possible solutions.
 First, we could integrate the shared length
-into our cost function, as did by \textcite{vanOosterom1995Development}.
+into our cost function, as did by \textcite{vanOosterom2005}.
 Second, we could weight the cost of shape more heavily
 (i.e., increasing weight factor~$\lambda$ of \eqs\ref{eq:g_1} and~\ref{eq:g_2}).
 According to our experiences, 
@@ -2436,9 +2436,9 @@ This would probably require a user study.
 	obtained by \Astar with different cost functions.
 	The numbers indicate the numbers of patches.
     The step from $8$ patches to $7$ patches 
-    when using cost function~$g1$ is a bad move; see figure (b). 
+    when using cost function~$g_1$ is a bad move; see figure (b). 
     Instead, we expect the result of figure (a). 
-    Using cost function~$g2$, we had a similar problem. 
+    Using cost function~$g_2$, we had a similar problem. 
     The subdivision with $7$ patches is such an example, 
     where we expect the result of figure (c).
 }
@@ -2813,8 +2813,8 @@ then the polygon must be assigned to itself,
 that is, $x_{t,r,r}=1$.
 
 
-Our second set of variables is used to compute the
-cost of type change.  We introduce
+We use the second set of variables in order to compute the
+cost of type change. We introduce
 \begin{flalign*}
 &\eqquadVariable
 \embrd[V]{y_{t,p,o,r}} \in
@@ -3398,7 +3398,7 @@ If we insist on involving a smallest patch at each step,
 then we need more variables and more constraints.
 
 
-\mypar{Aggregation involving a smallest patch}
+\subsubsection{Aggregation involving a smallest patch}
 In order to make sure that 
 each of our aggregation steps involves a smallest patch,
 we need another type of variable,~$w_{t,o}$.
