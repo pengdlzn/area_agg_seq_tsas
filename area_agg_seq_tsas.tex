@@ -6,7 +6,7 @@
 \title
 [Finding Optimal Sequences for Area Aggregation] %short title
 {Finding Optimal Sequences for Area Aggregation---\texorpdfstring
-    {\protect\\ \Astar vs.\ Integer Linear Programming} %title of the paper
+    {\Astar vs.\ Integer Linear Programming} %title of the paper
     {A* vs.\ Integer Linear Programming} %title of the pdf
 }
     
@@ -64,7 +64,7 @@ Every polygon on the smaller-scale map
 is the union of a set of adjacent polygons 
 on the larger-scale map. 
 
-In each step of the sequence that we compute, 
+In each step of the \mine{computed} sequence, 
 the smallest area is merged with one of its neighbors. 
 We do not select that neighbor according to a prescribed rule 
 but compute the whole sequence of pairwise merges at once, 
@@ -157,35 +157,43 @@ we want to change also map features smoothly
 when users are zooming.
 We believe that this strategy will allow users 
 to follow maps even more easily.
-The process of producing maps at any different scales
-with smooth changes 
+The process of producing maps \mine{with a smooth scale transition}
 is known as \emph{continuous map generalization} (CMG), 
 or simply \emph{continuous generalization}.
 Ideally, there should be no discrete change in CMG.
 However, the term is also used when 
 the discrete changes are small enough not to be noticed as,
-e.g., \textcite{Suba2016Road} state.
+e.g., \textcite{Suba2016Road} stated.
+%We consider CMG as the process of producing maps 
+%covering a continuous interval of scales,
+%where CMG considers constraints and quality measures 
+%that act across different scales. 
+%In our work, for example, the quality of an aggregation sequence 
+%is measured as a whole; 
+%whereas in classical generalization approaches, 
+%only the quality of a map at \mine{an} output scale is measured.
+%We consider CMG possible, desirable, and realistic.
+%In CMG, it is not necessary that 
+%all changes that occur during zooming are animated in a continuous fashion. 
+%That fashion may generally be possible. 
 
-We consider CMG as the process of producing maps 
-covering a continuous interval of scales,
-where CMG considers constraints and quality measures 
-that act across different scales. 
-In our work, for example, the quality of an aggregation sequence 
-is measured as a whole; 
-whereas in classical generalization approaches, 
-only the quality of a map at some output scale is measured.
-We consider CMG possible, desirable, and realistic.
-In CMG, it is not necessary that 
-all changes that occur during zooming are animated in a continuous fashion. 
-That fashion may generally be possible. 
-A simple way is to fade in and fade out raster maps
+A simple way \mine{of realizing CMG} is to fade in and fade out raster maps
 as did by \textcite{Pantazis2009b}, 
 but it is not at all clear 
-whether such animations would improve the experience of the map user.
-By contrast, we would like to carry out the changes in a more elegant way;
-we would like to change map features gradually.
+whether such animations would improve the experience of map users.
+\mine{Furthermore, although it is possible to generalize raster maps,
+we consider it more straightforward to work on vector maps.
+For example, \textcite{Jaakkola1998Generalization}
+generalized raster maps, but he used essentially the same object-based operators 
+that are common in the map generalization of vector data.
+He even converted raster data to vector data
+when he wanted to simplify the boundaries of the land-cover areas.
+Therefore, our paper will work on a vector map of land-cover areas.}
 
+%As , we would like to carry out the changes in a more elegant way;
+%we would like to change map features gradually.
 
+%He generalizes raster maps, using essentially the same object-based map generalization operators that are common in the generalization of vector data. I.e., patches consisting of pixels of equal land-cover types are considered as objects which can be merged with neighboring patches.
 
 
 \mypar{Problem definition}
@@ -195,9 +203,8 @@ When users zoom out, some land-cover areas become
 too tiny to be seen, which result in visual clutter.
 In order to provide users 
 with good visual experience during zooming operations,
-we propose to remove these tiny areas.
-We plan to achieve this goal by 
-aggregating them into neighboring land-cover areas.
+we propose to \mine{aggregate the tiny areas} 
+into their neighboring areas.
 
 A \emph{land-cover map} is a planar subdivision in which 
 each area belongs to a land-cover class or \emph{type}.
@@ -261,7 +268,7 @@ on the start map.
 The type of a region may differ from the types of its components. 
 For example, a small water area together with 
 multiple adjacent forest areas may constitute 
-a large forest region on the smaller-scale map.
+a large forest region on the \mine{goal} map.
 However, we assume that every region, on the goal map, 
 contains at least one area of the same type on the start map.
 Our assumptions hold if the goal map has been produced 
@@ -271,14 +278,14 @@ That method produces a land-cover map at a single smaller scale,
 given a land-cover map at a larger scale.
 Although \textcite{HaunertWolff2010AreaAgg}
 attain results of high quality, 
-they do not produce a sequence of land-cover maps.
+they do not produce a sequence of maps.
 
 Our method can also be extended to find an aggregation sequence 
 for two maps (a start map and a goal map) that are from different sources.
 In that case, one could compute a map overlay of the two maps
 and use the result 
 (with combined boundaries from both input maps and land cover classes 
-from the given large-scale map) 
+from the given larger-scale map) 
 as the start map.
 
 In this paper, we try to find an optimal sequence
@@ -313,7 +320,7 @@ by integrating our results into the \emph{space-scale cube}
 \end{figure*}
 
 \mypar{Contribution}
-We show related work (\sect\ref{sec:AreaAgg_RelatedWork}).
+We \mine{first} show \mine{some} related work (\sect\ref{sec:AreaAgg_RelatedWork}).
 Then, we formally model our problem, 
 analyze the size of our model in a worst-case scenario,
 introduce our methods,
@@ -360,7 +367,19 @@ the binary line generalisation tree (BLG-tree) of
 \textcite{vanOosterom1995Development},
 which is a hierarchical data structure that 
 defines a gradual line simplification process.
-%
+\mine{Note that simplifying polylines will not speed up 
+our three algorithms.
+The reason is that we compute the areas of the polygons 
+and the lengths of the boundaries in a preprocessing.
+These values will be associated with
+a graph representation of the dataset, 
+where polygons are represented as vertices and 
+a boundary separating two polygons (no matter how detailed it is) 
+is represented with a single edge.
+During computation, the three algorithms do not need to go through 
+the vertices of the land-cover areas.
+}
+
 Although splitting polygons is a good step
 of generalizing land-cover areas,
 we do not integrate it into our method at this moment.
@@ -373,8 +392,8 @@ to split a polygon (the splittee)
 based on a constrained Delaunay triangulation.
 During splitting, their algorithm is capable of
 taking into account
-the attractivenesses between the splittee and its neighbors.
-When merging, a more attractive neighbor 
+the attractivenesses between the splittee and its neighbors;
+when merging, a more attractive neighbor 
 will get a larger portion from the splittee.
 
 \section{Related Work}
@@ -2003,7 +2022,7 @@ respectively
 
 \begin{figure}[tb]
 \centering
-\includegraphics[page=2]{AreaAgg_CaseStudy1_Plot}
+\includegraphics[page=1]{AreaAgg_CaseStudy1_Plot}
 \caption{The numbers of regions where \Astar was 
 	forced to use the given overestimation parameters
 	in order to find a solution 
@@ -2048,7 +2067,7 @@ a poorer estimation for the cost of shape.
 }
 \label{tab:CostsInDetail}
 \centering
-\includegraphics[page=3]{AreaAgg_CaseStudy1_Plot}
+\includegraphics[page=2]{AreaAgg_CaseStudy1_Plot}
 \end{table*}
 
 
@@ -2455,11 +2474,10 @@ This would probably require a user study.
 In this paper, we investigated the problem of 
 finding optimal sequences for area aggregation.
 We compared three methods to solve this problem, namely, 
-a greedy algorithm, \Astar, and an ILP-based algorithm.
+a greedy algorithm, the \Astar algorithm, and an ILP-based algorithm.
 The greedy algorithm is used as a benchmark.
 Unsurprisingly, it ran faster than the other two methods by far.
-According to our experiments, \Astar found area aggregation 
-sequences
+According to our experiments, \Astar found area aggregation sequences
 with the least total cost over all regions.
 For some instances, however, \Astar had to overestimate
 in order to find feasible solutions.
@@ -2474,7 +2492,7 @@ For example, \fig\ref{fig:AreaAgg_CaseStudy2_Rg358}b shows that
 even an \emph{optimal} sequence can be bad.
 If it were not for \Astar, 
 we could not tell if the bad result was caused 
-by the greedy algorithm or the model.
+by the greedy algorithm or \mine{by} the model.
 Because of \Astar, we are sure that the bad result is from
 our model of minimizing the 
 type change and the compactness.
@@ -2596,8 +2614,10 @@ These issues can be considered in our future work.
 \begin{acks}
 We thank Thomas C. van Dijk, Joachim Spoerhase, 
 and Sabine Storandt for their valuable suggestions.
-We thank Martijn Meijers for 
+We are grateful to Martijn Meijers for 
 prereviewing an earlier version of this paper.
+\mine{We thank the anonymous reviewers for their comments,
+which were very helpful for us to improve the paper.}
 \end{acks}
 
 
