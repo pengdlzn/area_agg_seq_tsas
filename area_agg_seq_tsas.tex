@@ -5,7 +5,8 @@
 \begin{document}
 \title
 [Finding Optimal Sequences for Area Aggregation] %short title
-{Finding Optimal Sequences for Area Aggregation---\texorpdfstring
+{Finding Optimal Sequences for Area Aggregation---\\
+  \texorpdfstring
     {\Astar vs.\ Integer Linear Programming} %title of the paper
     {A* vs.\ Integer Linear Programming} %title of the pdf
 }
@@ -1210,9 +1211,8 @@ and the black vertex for $v$
 \begin{figure}[tb]
 \centering
 \includegraphics[page=1]{AreaAgg_NPHard}
-\caption{The reduction for our NP-hardness proof.
-    The dashed polygon in (c) shows 
-    the merged vertices.}
+\caption{Our NP-hardness reduction.  The dashed area in~(c) represents
+  the vertices that are merged.}
 \label{fig:AreaAgg_Reduction}
 \end{figure}
 
@@ -1231,15 +1231,15 @@ we require the smallest area to be aggregated with one of its neighbors.
 The area sizes correspond to the weights of the vertices in \fig\ref{fig:AreaAgg_Reduction}b.   
 Therefore, our definition of the weights to a certain degree determines 
 the order in which the vertices are selected:
-\begin{itemize}
-\item \emph{Phase I}: In each of the first~$2|E_\mathrm{A}|$ steps, 
+\begin{description}[leftmargin=1.7cm,style=sameline]
+\item[\emph{Phase I}:] In each of the first~$2|E_\mathrm{A}|$ steps, 
 a white vertex is selected and merged with one of its neighbors, 
 such that the white vertex receives the neighbor's color or vice versa
 (\fig\ref{fig:reduction2} shows a possible result).
-\item \emph{Phase II}: In each of the next~$|V_\mathrm{A}|$ steps, 
+\item[\emph{Phase II}:] In each of the next~$|V_\mathrm{A}|$ steps, 
 a non-gray vertex is selected and merged with one of its neighbors.
-\item \emph{Phase III}: $|V_\mathrm{A}|-1$ steps remain to reach the goal map.
-\end{itemize}
+\item[\emph{Phase III}:] $|V_\mathrm{A}|-1$ steps remain to reach the goal map.
+\end{description}
 
 To complete the reduction, 
 we need to define the costs of color changes. 
@@ -1293,7 +1293,7 @@ Therefore, we have found a contradiction to our assumption.
 \caption{The situation after Phase I has been conducted 
     such that all black vertices corresponding to a vertex cover 
     of~$G_\mathrm{A}$ have been recolored white.
-    The dashed polygons show that the vertices are merged.}
+    The dashed areas represent the vertices that are merged.}
 \label{fig:reduction2}
 \end{figure}
 \end{proof}
@@ -1846,11 +1846,10 @@ the resulting cost function for type change is a metric.
 \caption{Goal map, $734$ polygons, \\
 	at scale $1:250{,}000$}
 \end{subfigure}
-%
-%It doesn't work to directly use 
-%\vspace{\baselineskip} for subfigures.
-\par\vspace{\baselineskip} %Leave a gap	figures
-%
+
+\bigskip
+\bigskip
+
 \begin{subfigure}{\textwidth}
 \centering
 \includegraphics[page=3]{AreaAgg_Data}
@@ -1860,6 +1859,8 @@ the resulting cost function for type change is a metric.
 \label{fig:AreaAgg_Data}
 \end{figure}
 
+%\begin{figure}[p]
+%\begin{minipage}{\textwidth}
 \begin{figure}[tb]
 \centering
 \includegraphics[page=4]{AreaAgg_Data}
@@ -1868,7 +1869,9 @@ the resulting cost function for type change is a metric.
 	of a given size range are contained in our dataset.}
 \label{fig:AreaAgg_NumRegion}
 \end{figure}
+% \end{minipage}
 
+%\begin{minipage}{\textwidth}
 \begin{figure}[tb]
 \centering
 \includegraphics[page=5]{AreaAgg_Data}
@@ -1877,6 +1880,8 @@ the resulting cost function for type change is a metric.
 	types \emph{village} and \emph{farm land} is~$6$.}
 \label{fig:AreaAgg_TypeDistances}
 \end{figure}
+%\end{minipage}
+%\end{figure}
 
 \subsection{Using costs of type change and compactness}
 \label{sec:AreaAgg_CaseStudy1}
@@ -2401,8 +2406,8 @@ when using the two time limits, i.e., $100\,$s and~$200\,$s.
 \caption{The number of regions for which
 	our ILP found optimal, feasible, or no solutions 
 	when using time limits~$100\,$s and~$200\,$s.
-	Using more time, our ILP was able to 
-	solve more instances to optimality.}
+	Using twice the time, our ILP was able to 
+	solve only 5.8$\,$\% more instances to optimality.}
 \label{fig:AreaAgg_CaseStudy2_ILP}
 \end{figure}
 
